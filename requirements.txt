@@ -1,0 +1,9 @@
+
+requests_oauth2
+
+#urllib3
+#string
+#random
+#base64
+
+requests>=2.22.0
