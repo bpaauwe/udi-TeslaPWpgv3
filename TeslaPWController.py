@@ -2,7 +2,7 @@
 PG_CLOUD_ONLY = False
 
 try:
-    import polyinterface
+    import udi_interface
 except ImportError:
     import pgc_interface as polyinterface
     PG_CLOUD_ONLY = True
@@ -15,15 +15,27 @@ from TeslaPWSetupNode import teslaPWSetupNode
 from TeslaPWStatusNode import teslaPWStatusNode
 
 
-LOGGER = polyinterface.LOGGER
-               
-class TeslaPWController(polyinterface.Controller):
+LOGGER = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
-    def __init__(self, polyglot):
-        super(TeslaPWController, self).__init__(polyglot)
+class TeslaPWController(udi_interface.Node):
+    def __init__(self, polyglot, primary, address, name):
+        super().__init__(polyglot, primary, address, name)
+        self.poly = polyglot
+    #def __init__(self, polyglot):
+   #     super(TeslaPWController, self).__init__(polyglot)
         LOGGER.info('_init_ Tesla Power Wall Controller - 1')
         self.ISYforced = False
         self.name = 'Tesla PowerWall Info'
+        self.primary = primary
+        self.address = address
+        self.Parameters = Custom(polyglot, 'customparams')
+
+        self.poly.subscribe(self.poly.START, self.start, address)
+        self.poly.subscribe(self.poly.CUSTOMPARAMS, self.handleParameters)
+        self.poly.ready()
+        self.poly.addNode(self)
+        self.Parameters = Custom(polyglot, 'customparams')
 
         LOGGER.debug('self.address : ' + str(self.address))
         LOGGER.debug('self.name :' + str(self.name))
@@ -285,9 +297,9 @@ class TeslaPWController(polyinterface.Controller):
 if __name__ == "__main__":
     try:
         #LOGGER.info('Starting Tesla Power Wall Controller')
-        polyglot = polyinterface.Interface('TeslaPWControl')
+        polyglot = udi_interface.Interface([])
         polyglot.start()
-        control = TeslaPWController(polyglot)
-        control.runForever()
+        TeslaPWController(polyglot, 'controller', 'controller', 'TeslaPWControl')
+        polyglot.runForever()
     except (KeyboardInterrupt, SystemExit):
         sys.exit(0)
