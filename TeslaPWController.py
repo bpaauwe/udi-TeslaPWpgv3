@@ -32,7 +32,10 @@ class TeslaPWController(udi_interface.Node):
         self.Parameters = Custom(polyglot, 'customparams')
 
         self.poly.subscribe(self.poly.START, self.start, address)
-        self.poly.subscribe(self.poly.CUSTOMPARAMS, self.handleParameters)
+        #self.poly.subscribe(self.poly.POLL, self.start, address)
+        self.poly.subscribe(self.poly.CUSTOMPARAMS, self.userParams)
+        self.poly.subscribe(self.poly.notices, self.notifi)
+
         self.poly.ready()
         self.poly.addNode(self)
         self.Parameters = Custom(polyglot, 'customparams')
@@ -58,28 +61,8 @@ class TeslaPWController(udi_interface.Node):
         
         self.cloudAccess = False
         self.localAccess = False
-        self.captcha = ''
-        if PG_CLOUD_ONLY:
-            self.cloudAccess = True
-            self.logFile = False
-            self.access = 'CLOUD'
 
-            self.cloudUserEmail = self.getCustomParam('CLOUD_USER_EMAIL')
-            if self.cloudUserEmail == None:
-                self.addCustomParam({'CLOUD_USER_EMAIL': 'me@myTeslaCloudemail.com'})
-                self.defaultParams['CLOUD']['CLOUD_USER_EMAIL'] = 'me@myTeslaCloudemail.com'
-
-            self.cloudUserPassword =self.getCustomParam('CLOUD_USER_PASSWORD')
-            if self.cloudUserPassword == None:
-                self.addCustomParam({'CLOUD_USER_PASSWORD': 'XXXXXXXX'})
-                self.defaultParams['CLOUD']['CLOUD_USER_PASSWORD'] = 'XXXXXXXX'
-
-            self.captchaAPIkey = self.getCustomParam('CAPTCHA_APIKEY')
-            if self.captchaAPIkey == None:
-                self.addCustomParam({'CAPTCHA_APIKEY': 'api key to enable AUTO captcha solver'})        
-                self.defaultParams['CLOUD']['CAPTCHA_APIKEY'] =  'api key to enable AUTO captcha solver'
-        else:
-
+        '''
             self.removeNoticesAll()
             self.addNotice('Check CONFIG to make sure all relevant paraeters are set')
 
@@ -125,7 +108,7 @@ class TeslaPWController(udi_interface.Node):
             while self.getCustomParam('ACCESS') == 'LOCAL/CLOUD/BOTH':
                 time.sleep(2)
             self.access = self.getCustomParam('ACCESS')
-
+        '''
         if self.access == 'BOTH' or self.access == 'CLOUD':
             # wait for user to set parameters
             allKeysSet = False
@@ -195,9 +178,55 @@ class TeslaPWController(udi_interface.Node):
             self.stop()
         LOGGER.debug ('Controler - start done')
 
+    def userParams (self ):
+        self.removeNoticesAll()
+        self.addNotice('Check CONFIG to make sure all relevant paraeters are set')
+
+        self.access = self.getCustomParam('ACCESS') 
+        if self.access == None:
+            self.addCustomParam({'ACCESS': 'LOCAL/CLOUD/BOTH'})
+            
+        self.localUserEmail = self.getCustomParam('LOCAL_USER_EMAIL')
+        if self.localUserEmail == None:
+            self.addCustomParam({'LOCAL_USER_EMAIL': 'me@localPowerwall.com'})
+            self.defaultParams['LOCAL']['LOCAL_USER_EMAIL'] =  'me@localPowerwall.com'
+
+        self.localUserPassword =self.getCustomParam('LOCAL_USER_PASSWORD')
+        if self.localUserPassword == None:
+            self.addCustomParam({'LOCAL_USER_PASSWORD': 'XXXXXXXX'})
+            self.defaultParams['LOCAL']['LOCAL_USER_PASSWORD'] =  'XXXXXXXX'
+            
+        self.IPAddress = self.getCustomParam('IP_ADDRESS')
+        if  self.IPAddress == None:
+            self.addCustomParam({'IP_ADDRESS': '192.168.1.xxx'})  
+            self.defaultParams['LOCAL']['IP_ADDRESS'] =  '192.168.1.xxx'
+
+        self.cloudUserEmail = self.getCustomParam('CLOUD_USER_EMAIL')
+        if self.cloudUserEmail == None:
+            self.addCustomParam({'CLOUD_USER_EMAIL': 'me@myTeslaCloudemail.com'})
+            self.defaultParams['CLOUD']['CLOUD_USER_EMAIL'] = 'me@myTeslaCloudemail.com'
+
+        self.cloudUserPassword =self.getCustomParam('CLOUD_USER_PASSWORD')
+        if self.cloudUserPassword == None:
+            self.addCustomParam({'CLOUD_USER_PASSWORD': 'XXXXXXXX'})
+            self.defaultParams['CLOUD']['CLOUD_USER_PASSWORD'] = 'XXXXXXXX'
+
+        self.captchaAPIkey = self.getCustomParam('CAPTCHA_APIKEY')
+        if self.captchaAPIkey == None:
+            self.addCustomParam({'CAPTCHA_APIKEY': 'api key to enable AUTO captcha solver'})
+            self.defaultParams['CLOUD']['CAPTCHA_APIKEY'] =  'api key to enable AUTO captcha solver'
+
+        self.logFile = self.getCustomParam('LOGFILE')
+        if self.logFile == None:
+            self.addCustomParam({'LOGFILE':'DISABLED'})
+
+        # Wait for self.access to be updated
+        while self.getCustomParam('ACCESS') == 'LOCAL/CLOUD/BOTH':
+            time.sleep(2)
+        self.access = self.getCustomParam('ACCESS')
+    
     def stop(self):
-        if not(PG_CLOUD_ONLY):
-            self.removeNoticesAll()
+        #self.removeNoticesAll()
         if self.TPW:
             self.TPW.disconnectTPW()
         
