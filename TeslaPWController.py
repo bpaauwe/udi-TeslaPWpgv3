@@ -29,12 +29,16 @@ class TeslaPWController(udi_interface.Node):
         self.name = 'Tesla PowerWall Info'
         self.primary = primary
         self.address = address
+
         self.Parameters = Custom(polyglot, 'customparams')
+        self.Notices = Custom(polyglot, 'notices')
+
 
         self.poly.subscribe(self.poly.START, self.start, address)
-        #self.poly.subscribe(self.poly.POLL, self.start, address)
         self.poly.subscribe(self.poly.CUSTOMPARAMS, self.userParams)
-        self.poly.subscribe(self.poly.notices, self.notifi)
+        #self.poly.subscribe(self.poly.notices, self.notifications)
+        self.poly.subscribe(self.poly.notices, self.notifications)
+        self.poly.subscribe(self.poly.POLL, self.systempoll)
 
         self.poly.ready()
         self.poly.addNode(self)
@@ -232,6 +236,9 @@ class TeslaPWController(udi_interface.Node):
         
         LOGGER.debug('stop - Cleaning up')
 
+    def parameterHandler(self, params):
+        self.Parameters.lad(param)
+
     def heartbeat(self):
         LOGGER.debug('heartbeat: ' + str(self.hb))
         
@@ -242,6 +249,12 @@ class TeslaPWController(udi_interface.Node):
             self.reportCmd('DOF',2)
             self.hb = 0
         
+    def systemPoll(self, pollList):
+        if 'shortPoll' in pollList:
+            self.shortPoll()
+        if 'longPoll' in pollList:
+            self.longPoll()
+
 
     def shortPoll(self):
         LOGGER.info('Tesla Power Wall Controller shortPoll')
