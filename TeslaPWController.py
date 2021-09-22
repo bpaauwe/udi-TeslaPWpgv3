@@ -63,6 +63,7 @@ class TeslaPWController(udi_interface.Node):
         
         LOGGER.debug('start')
         #self.poly.setCustomParamsDoc()
+        self.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
         self.checkParameters()
         #self.poly.Notices.clear()
         #self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
@@ -182,8 +183,8 @@ class TeslaPWController(udi_interface.Node):
         if self.Parameters['LOGFILE'] is None:
             self.Parameters['LOGFILE'] = 'DISABLED'
        
-    def handleNotifications(self):
-        self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
+    #def handleNotifications(self):
+        
 
     
     def stop(self):
