@@ -4,14 +4,10 @@ import json
 import os 
 
 PG_CLOUD_ONLY = False
+import udi_interface
 
-try:
-    import polyinterface
-except ImportError:
-    import pgc_interface as polyinterface
-    PG_CLOUD_ONLY = True
 
-LOGGER = polyinterface.LOGGER
+LOGGER = udi_interface.LOGGER
 
 #import LOGGER
 class isyHandling:

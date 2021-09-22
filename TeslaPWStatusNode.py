@@ -14,12 +14,12 @@ LOGGER = udi_interface.LOGGER
                
 class teslaPWStatusNode(udi_interface.Node):
 
-    def __init__(self, polyglot, primary, address, name):
+    def __init__(self, polyglot, primary, address, name, TPW):
         super(teslaPWStatusNode, self).__init__(polyglot, primary, address, name)
 
         LOGGER.info('_init_ Tesla Power Wall Status Node')
         self.ISYforced = False
-        self.TPW = self.parent.TPW
+        self.TPW = TPW
         self.address = address 
         self.id = address
         self.name = name
