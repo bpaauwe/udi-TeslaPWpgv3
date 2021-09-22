@@ -17,7 +17,7 @@ Custom = udi_interface.Custom
 
 class TeslaPWController(udi_interface.Node):
     def __init__(self, polyglot, primary, address, name):
-        super().__init__(polyglot, primary, address, name)
+        super(TeslaPWController, self).__init__(polyglot, primary, address, name)
         self.poly = polyglot
 
         LOGGER.info('_init_ Tesla Power Wall Controller - 1')
