@@ -27,6 +27,7 @@ class TeslaPWController(udi_interface.Node):
         self.address = address
 
         self.poly.subscribe(self.poly.START, self.start, address)
+        self.poly.subscribe(self.poly.LOGLEVEL, self.handleLevelChange)
 
         self.Parameters = Custom(polyglot, 'customparams')
         self.poly.subscribe(self.poly.CUSTOMPARAMS, self.handleParams)
@@ -50,13 +51,12 @@ class TeslaPWController(udi_interface.Node):
         LOGGER.debug('Controller init DONE')
         self.longPollCountMissed = 0
         
-        self.defaultParams = {   'CLOUD':  { } ,
+        self.defaultParams = {  'CLOUD':  { } ,
                                 'LOCAL':  { },
                             }   
 
     def start(self):
-
-        
+       
         LOGGER.debug('start')
         #self.poly.setCustomParamsDoc()
         self.Notices['start'] = 'Check Configuration to make sure all relevant paraeters are set'
@@ -141,6 +141,9 @@ class TeslaPWController(udi_interface.Node):
             LOGGER.info('Did not connect to power wall')
             self.stop()
         LOGGER.debug ('Controler - start done')
+
+    def handleLevelChange(self, level):
+        LOGGER.info('New log level: {}'.format(level))
 
     def handleParams (self, userParam ):
         LOGGER.debug('handleParams')

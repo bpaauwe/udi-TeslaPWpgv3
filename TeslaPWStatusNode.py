@@ -27,7 +27,9 @@ class teslaPWStatusNode(udi_interface.Node):
 
 
         self.drivers = []
+        self.poly.subscribe(self.poly.LOGLEVEL, self.handleLevelChange)
         self.poly.subscribe(self.poly.START, self.start, address)
+
         
         self.nodeDefineDone = False
         LOGGER.debug('Start Tesla Power Wall Status Node')  
@@ -57,6 +59,10 @@ class teslaPWStatusNode(udi_interface.Node):
 
     def stop(self):
         LOGGER.debug('stop - Cleaning up')
+    
+    
+    def handleLevelChange(self, level):
+        LOGGER.info('New log level: {}'.format(level))
     
     def shortPoll(self):
         #No need to poll data - done by Controller
