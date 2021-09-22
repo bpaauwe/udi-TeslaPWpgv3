@@ -121,7 +121,7 @@ class TeslaPWController(udi_interface.Node):
             
             LOGGER.info('Creating Nodes')
             nodeList = self.TPW.getNodeIdList()
-            
+            '''
             for node in nodeList:
                 name = self.TPW.getNodeName(node)
                 LOGGER.debug('Setup Node(node, name, address) ' + str(node) + ' , '+ str(name) + ' , '+str(self.address))
@@ -131,6 +131,8 @@ class TeslaPWController(udi_interface.Node):
                 if node == self.TPW.getStatusNodeID():    
                     ##self.addNode(teslaPWStatusNode(self,self.address, node, name))
                     self.poly.addNode(teslaPWStatusNode(self.poly, self.address, node, name))
+
+            '''
             LOGGER.debug('Node installation complete')
             self.nodeDefineDone = True
             LOGGER.debug('updateISYdrivers')
