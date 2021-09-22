@@ -32,7 +32,7 @@ class TeslaPWController(udi_interface.Node):
         self.poly.subscribe(self.poly.CUSTOMPARAMS, self.handleParams)
 
         self.Notices = Custom(polyglot, 'notices')
-        #self.poly.subscribe(self.poly.Notices, self.notifications)
+        self.poly.subscribe(self.poly.Notices, self.handleNotifications)
 
 
         #self.poly.subscribe(self.poly.notices, self.notifications)
@@ -147,7 +147,7 @@ class TeslaPWController(udi_interface.Node):
         LOGGER.debug('handleParams')
         self.Parameters.load(userParam)
 
-        self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
+        
          
         if self.Parameters['access'] is None:
             self.Parameters['access'] = 'LOCAL/CLOUD/BOTH'
@@ -179,7 +179,8 @@ class TeslaPWController(udi_interface.Node):
         if self.Parameters['LOGFILE'] is None:
             self.Parameters['LOGFILE'] = 'DISABLED'
        
-
+    def handleNotifications(self):
+        self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
 
     
     def stop(self):
@@ -201,7 +202,7 @@ class TeslaPWController(udi_interface.Node):
             self.hb = 0
         
     def systemPoll(self, pollList):
-        LOGGERR.debug('systemPoll')
+        LOGGER.debug('systemPoll')
         if 'shortPoll' in pollList:
             self.shortPoll()
         if 'longPoll' in pollList:
@@ -249,8 +250,6 @@ class TeslaPWController(udi_interface.Node):
         value = 1
         if level == 'all':
             value = self.TPW.getISYvalue('ST', self.address)
-            self.setDriver('ST',value, report = True, force = True) 
-            #LOGGER.debug('Update ISY drivers :' + str('ST')+ '  value:' + str(value) )
             if value == 0:
                 self.longPollCountMissed = self.longPollCountMissed + 1
             else:
@@ -259,8 +258,8 @@ class TeslaPWController(udi_interface.Node):
             LOGGER.debug('Update ISY drivers :' + str('GV2')+ '  value:' + str(self.longPollCountMissed) )
         elif level == 'critical':
             value = self.TPW.getISYvalue('ST', self.address)
-            self.setDriver('ST', value, report = True, force = True)  
-            LOGGER.debug('Update ISY drivers :' + str('ST')+ '  value:' + str(value) )   
+            #self.setDriver('ST', value, report = True, force = True)  
+            #LOGGER.debug('Update ISY drivers :' + str('ST')+ '  value:' + str(value) )   
             if value == 0:
                 self.longPollCountMissed = self.longPollCountMissed + 1
             else:
