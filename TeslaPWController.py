@@ -38,7 +38,7 @@ class TeslaPWController(udi_interface.Node):
 
         #self.poly.subscribe(self.poly.notices, self.notifications)
         
-        self.poly.subscribe(self.poly.POLL, self.systempoll)
+        self.poly.subscribe(self.poly.POLL, self.systemPoll)
 
         self.poly.ready()
         self.poly.addNode(self)
