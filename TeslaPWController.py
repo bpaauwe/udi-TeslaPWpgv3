@@ -74,6 +74,7 @@ class TeslaPWController(udi_interface.Node):
         # Wait for self.Parameters['access'] to be updated
         while self.Parameters['access']  == 'LOCAL/CLOUD/BOTH':
             time.sleep(2)
+            LOGGER.debug('Waiting for Access to be set ')
        
         
         if self.Parameters['access'] == 'BOTH' or self.Parameters['access'] == 'CLOUD':
