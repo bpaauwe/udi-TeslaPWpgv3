@@ -99,7 +99,7 @@ class TeslaPWController(udi_interface.Node):
             else:
                 self.localAccess = True
             #all local keys defined
-            
+
 
         LOGGER.debug('starting Login process')
         try:
@@ -256,7 +256,7 @@ class TeslaPWController(udi_interface.Node):
         LOGGER.debug('System updateISYdrivers - ' + str(level))
         value = 1
         if level == 'all':
-            value = self.TPW.getISYvalue('ST', self.address)
+            value = self.TPW.getISYvalue('GV3', self.address)
             if value == 0:
                 self.longPollCountMissed = self.longPollCountMissed + 1
             else:
@@ -264,7 +264,7 @@ class TeslaPWController(udi_interface.Node):
             self.setDriver('GV2', int(self.longPollCountMissed), report = True, force = True)     
             LOGGER.debug('Update ISY drivers :' + str('GV2')+ '  value:' + str(self.longPollCountMissed) )
         elif level == 'critical':
-            value = self.TPW.getISYvalue('ST', self.address)
+            value = self.TPW.getISYvalue('GV3', self.address)
             #self.setDriver('ST', value, report = True, force = True)  
             #LOGGER.debug('Update ISY drivers :' + str('ST')+ '  value:' + str(value) )   
             if value == 0:
@@ -290,8 +290,9 @@ class TeslaPWController(udi_interface.Node):
  
     commands = { 'UPDATE': ISYupdate }
 
-    #if PG_CLOUD_ONLY:
+
     drivers= [{'driver': 'ST', 'value':0, 'uom':2},
+              {'driver': 'GV3', 'value':0, 'uom':25},
               {'driver': 'GV2', 'value':0, 'uom':107}]
 
 

@@ -227,10 +227,13 @@ class tesla_info:
         self.yesterdayGenerator = 'yesterGenerator'
 
         self.isyINFO.addISYcontroller(self.controllerID, self.controllerName,'Electricity' )
-        self.isyINFO.addISYstatus(self.controllerID, self.statusName)
+        #self.isyINFO.addISYstatus(self.controllerID, self.statusName)
         self.isyINFO.addISYcommandSend(self.controllerID, 'DON')
         self.isyINFO.addISYcommandSend(self.controllerID, 'DOF')
         self.isyINFO.addIsyVaraiable (self.controllerID, self.nodeServerUp, 'raw1bunsign',0, 255, None, None, 0, 'Missed LongPolls',  None) 
+        self.isyINFO.addIsyVaraiable (self.controllerID, self.nodeServerUp, 'list', None,None, '0-1',None, None, 'Connected to Tesla Power Wall', { 0:'False', 1: 'True' } )
+        self.addISYCriticalParam(self.controllerID, self.nodeServerUp)
+
         self.isyINFO.addISYcommandReceive(self.controllerID, 'UPDATE', 'Update System Data', None)
         #self.isyINFO.addControllerDefStruct(self.controllerID, self.controllerName )
 
