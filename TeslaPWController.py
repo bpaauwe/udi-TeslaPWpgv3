@@ -19,8 +19,7 @@ class TeslaPWController(udi_interface.Node):
     def __init__(self, polyglot, primary, address, name):
         super().__init__(polyglot, primary, address, name)
         self.poly = polyglot
-    #def __init__(self, polyglot):
-   #     super(TeslaPWController, self).__init__(polyglot)
+
         LOGGER.info('_init_ Tesla Power Wall Controller - 1')
         self.ISYforced = False
         self.name = 'Tesla PowerWall Info'
@@ -59,13 +58,10 @@ class TeslaPWController(udi_interface.Node):
                                 'LOCAL':  { },
                             }   
 
-
-    
-
-
     def start(self):
-        self.poly.Notices.clear()
-        self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
+        LOGGER.debug('start')
+        #self.poly.Notices.clear()
+        #self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
         self.cloudAccess = False
         self.localAccess = False
 
@@ -103,10 +99,10 @@ class TeslaPWController(udi_interface.Node):
             #all local keys defined
         
 
-
+        LOGGER.debug('starting Login process')
         try:
             self.TPW = tesla_info(self.name, self.address, self.Parameters['access'])
-            self.poly.Notices.clear()
+            #self.poly.Notices.clear()
             if self.localAccess:
                 self.TPW.loginLocal(self.Parameters['LOCAL_USER_EMAIL'], self.Parameters['LOCAL_USER_PASSWORD'], self.Parameters['IP_ADDRESS'])
             if self.cloudAccess:
