@@ -59,7 +59,7 @@ class TeslaPWController(udi_interface.Node):
         
         LOGGER.debug('start')
         #self.poly.setCustomParamsDoc()
-        self.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
+        self.Notices['start'] = 'Check Configuration to make sure all relevant paraeters are set'
         self.checkParameters()
         #self.poly.Notices.clear()
         #self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
