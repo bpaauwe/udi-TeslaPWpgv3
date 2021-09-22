@@ -32,7 +32,7 @@ class TeslaPWController(udi_interface.Node):
         self.poly.subscribe(self.poly.CUSTOMPARAMS, self.handleParams)
 
         self.Notices = Custom(polyglot, 'notices')
-        self.poly.subscribe(self.poly.Notices, self.handleNotifications)
+        #self.poly.subscribe(self.poly.Notices, self.handleNotifications)
 
 
         #self.poly.subscribe(self.poly.notices, self.notifications)
