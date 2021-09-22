@@ -60,6 +60,7 @@ class TeslaPWController(udi_interface.Node):
 
     def start(self):
         LOGGER.debug('start')
+        self.poly.setCustomParamsDoc()
         #self.poly.Notices.clear()
         #self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
         self.cloudAccess = False
