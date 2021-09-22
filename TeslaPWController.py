@@ -59,15 +59,16 @@ class TeslaPWController(udi_interface.Node):
                             }   
 
     def start(self):
+
+        
         LOGGER.debug('start')
-        self.poly.setCustomParamsDoc()
+        #self.poly.setCustomParamsDoc()
+        self.checkParameters()
         #self.poly.Notices.clear()
         #self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
         self.cloudAccess = False
         self.localAccess = False
-
-      
-
+   
         # Wait for self.Parameters['access'] to be updated
         while self.Parameters['access']  == 'LOCAL/CLOUD/BOTH':
             time.sleep(2)
@@ -148,9 +149,9 @@ class TeslaPWController(udi_interface.Node):
     def handleParams (self, userParam ):
         LOGGER.debug('handleParams')
         self.Parameters.load(userParam)
-
+        self.checkParameters()
         
-         
+    def checkParameters(self):
         if self.Parameters['access'] is None:
             self.Parameters['access'] = 'LOCAL/CLOUD/BOTH'
              
