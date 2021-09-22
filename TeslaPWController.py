@@ -144,6 +144,7 @@ class TeslaPWController(udi_interface.Node):
         LOGGER.debug ('Controler - start done')
 
     def handleParams (self, userParam ):
+        LOGGER.debug('handleParams')
         self.Parameters.load(userParam)
 
         self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
@@ -188,8 +189,6 @@ class TeslaPWController(udi_interface.Node):
         
         LOGGER.debug('stop - Cleaning up')
 
-    def parameterHandler(self, params):
-        self.Parameters.load(params)
 
     def heartbeat(self):
         LOGGER.debug('heartbeat: ' + str(self.hb))
@@ -202,6 +201,7 @@ class TeslaPWController(udi_interface.Node):
             self.hb = 0
         
     def systemPoll(self, pollList):
+        LOGGERR.debug('systemPoll')
         if 'shortPoll' in pollList:
             self.shortPoll()
         if 'longPoll' in pollList:
