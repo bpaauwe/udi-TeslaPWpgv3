@@ -32,11 +32,7 @@ class TeslaPWController(udi_interface.Node):
         self.poly.subscribe(self.poly.CUSTOMPARAMS, self.handleParams)
 
         self.Notices = Custom(polyglot, 'notices')
-        #self.poly.subscribe(self.poly.Notices, self.handleNotifications)
-
-
-        #self.poly.subscribe(self.poly.notices, self.notifications)
-        
+       
         self.poly.subscribe(self.poly.POLL, self.systemPoll)
 
         self.poly.ready()
@@ -123,7 +119,7 @@ class TeslaPWController(udi_interface.Node):
             
             LOGGER.info('Creating Nodes')
             nodeList = self.TPW.getNodeIdList()
-            '''
+            
             for node in nodeList:
                 name = self.TPW.getNodeName(node)
                 LOGGER.debug('Setup Node(node, name, address) ' + str(node) + ' , '+ str(name) + ' , '+str(self.address))
@@ -134,7 +130,6 @@ class TeslaPWController(udi_interface.Node):
                     ##self.addNode(teslaPWStatusNode(self,self.address, node, name))
                     self.poly.addNode(teslaPWStatusNode(self.poly, self.address, node, name))
 
-            '''
             LOGGER.debug('Node installation complete')
             self.nodeDefineDone = True
             LOGGER.debug('updateISYdrivers')
@@ -289,7 +284,7 @@ class TeslaPWController(udi_interface.Node):
 
     #if PG_CLOUD_ONLY:
     drivers= [{'driver': 'ST', 'value':0, 'uom':2},
-                {'driver': 'GV2', 'value':0, 'uom':107}]
+              {'driver': 'GV2', 'value':0, 'uom':107}]
 
 
 if __name__ == "__main__":
