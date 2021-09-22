@@ -1,5 +1,6 @@
 
 requests_oauth2
+udi_interface
 git+https://github.com/jrester/tesla_powerwall#egg=tesla_powerwall
 git+https://github.com/maraujop/requests-oauth2#egg=requests-oauth2
 
