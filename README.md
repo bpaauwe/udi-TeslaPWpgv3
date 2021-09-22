@@ -1,7 +1,7 @@
-# udi-powerwall
+# udi-powerwall  -  for Polyglot v3 
 ## Power wall Node server
-The main node displays node status - 
-Setup node allows configuration of different parameters 
+The main node displays node status
+Setup node allows configuration of different parameters  (requires cloud access)
 Status node gives a firewall status 
 
 
@@ -24,10 +24,7 @@ Configuration requires 4 steps first time:
 2) Next user will speficy the needed user IDs and passwords for the selected option and local Tesla power wall IP address if chosen.
 3) Restart
 
-### Polyglot Cloud
-1) First user needs to sepcifiy source of data (CLOUD/BOTH) 
-Configuration requires user to enter CLOUD_USER_EMAIL and CLOUD_USER_PASSWORD keywords under confuguration.  Furthermore, a API key for 2captcha is required to pass the recaptcha Tesla is presenting.  Key can be acquired from https://2captcha.com?from=12244449 (referral to me).  Cost is reasonable ~ 3$ for 1000 recapta solves (1000 time starting the node)
-Restart 
+
 
 ## Notes 
 Using cloud access user can set all parameters mobile app currently supports (except car charging limit).

@@ -2,12 +2,9 @@
 
 PG_CLOUD_ONLY = False
 
-try:
-    import polyinterface
-except ImportError:
-    import pgc_interface as polyinterface
-    PG_CLOUD_ONLY = True
-LOGGER = polyinterface.LOGGER
+
+import udi_interface
+LOGGER = udi_interface.LOGGER
 
 import requests
 import json

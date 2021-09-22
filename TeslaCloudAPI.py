@@ -12,12 +12,8 @@ from TPWauth import TPWauth
 
 PG_CLOUD_ONLY = False
 
-try:
-    import polyinterface
-except ImportError:
-    import pgc_interface as polyinterface
-    PG_CLOUD_ONLY = True
 
+import udi_interface
 LOGGER = polyinterface.LOGGER
 
 #import LOGGER

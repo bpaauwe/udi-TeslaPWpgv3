@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
 PG_CLOUD_ONLY = False
 
-try:
-    import polyinterface
-except ImportError:
-    import pgc_interface as polyinterface
-    PG_CLOUD_ONLY = True
+
+import udi_interface
+
 
 #from os import truncate
 import sys
 import TeslaInfo
 import ISYprofile
 
-LOGGER = polyinterface.LOGGER
+LOGGER = udi_interface.LOGGER
                
-class teslaPWStatusNode(polyinterface.Node):
+class teslaPWStatusNode(udi_interface.Node):
 
     def __init__(self, controller, primary, address, name):
         super().__init__(controller, primary, address, name)
@@ -27,9 +25,10 @@ class teslaPWStatusNode(polyinterface.Node):
         self.name = name
         self.hb = 0
 
-        if not(PG_CLOUD_ONLY):
-             self.drivers = []
 
+        self.drivers = []
+        self.poly.subscribe(self.poly.START, self.start, address)
+        
         self.nodeDefineDone = False
         LOGGER.debug('Start Tesla Power Wall Status Node')  
 
@@ -39,15 +38,15 @@ class teslaPWStatusNode(polyinterface.Node):
         self.ISYcriticalParams = self.TPW.criticalParamters(self.id)
         #LOGGER.debug ('Node = ISYcriticalParams :' + str(self.ISYcriticalParams))
     
-        if not(PG_CLOUD_ONLY):
-            for key in self.ISYparams:
-                info = self.ISYparams[key]
-                #LOGGER.debug(key )
-                if info != {}:
-                    value = self.TPW.getISYvalue(key, self.id)
-                    LOGGER.debug('StatusNode: driver' + str(key)+ ' value:' + str(value) + ' uom:' + str(info['uom']) )
-                    self.drivers.append({'driver':key, 'value':value, 'uom':info['uom'] })
-            LOGGER.debug( 'Status node init - DONE')
+
+        for key in self.ISYparams:
+            info = self.ISYparams[key]
+            #LOGGER.debug(key )
+            if info != {}:
+                value = self.TPW.getISYvalue(key, self.id)
+                LOGGER.debug('StatusNode: driver' + str(key)+ ' value:' + str(value) + ' uom:' + str(info['uom']) )
+                self.drivers.append({'driver':key, 'value':value, 'uom':info['uom'] })
+        LOGGER.debug( 'Status node init - DONE')
 
 
     def start(self):                
@@ -113,27 +112,6 @@ class teslaPWStatusNode(polyinterface.Node):
     commands = { 'UPDATE': ISYupdate, 
                 }
 
-    if PG_CLOUD_ONLY:
-            drivers= [
-                     {'driver': 'GV1', 'value':0, 'uom':51}
-                    ,{'driver': 'GV2', 'value':0, 'uom':25}
-                    ,{'driver': 'GV3', 'value':0, 'uom':25}
-                    ,{'driver': 'GV4', 'value':0, 'uom':25}
-                    ,{'driver': 'GV5', 'value':0, 'uom':58}
-                    ,{'driver': 'GV6', 'value':0, 'uom':33}
-                    ,{'driver': 'GV7', 'value':0, 'uom':33}
-                    ,{'driver': 'GV8', 'value':0, 'uom':33}
-                    ,{'driver': 'GV9', 'value':0, 'uom':33}
-                    ,{'driver': 'GV10', 'value':0, 'uom':33}
-                    ,{'driver': 'GV11', 'value':0, 'uom':33}
-                    ,{'driver': 'GV12', 'value':0, 'uom':33}
-                    ,{'driver': 'GV13', 'value':0, 'uom':33}
-                    ,{'driver': 'GV14', 'value':0, 'uom':33}
-                    ,{'driver': 'GV15', 'value':0, 'uom':33}
-                    ,{'driver': 'GV16', 'value':0, 'uom':33}
-                    ,{'driver': 'GV17', 'value':0, 'uom':33}
-                    ,{'driver': 'GV18', 'value':0, 'uom':33}
-                    ,{'driver': 'GV19', 'value':0, 'uom':33}
-            ]
+
 
 

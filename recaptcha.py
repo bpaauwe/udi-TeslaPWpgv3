@@ -3,12 +3,10 @@ from time import sleep
 import base64
 
 
-try:
-    import polyinterface
-except ImportError:
-    import pgc_interface as polyinterface
-    PG_CLOUD_ONLY = True  
-LOGGER = polyinterface.LOGGER
+
+import udi_interface
+
+LOGGER = udi_interface.LOGGER
 
 
 # It goes to say this work takes effort so please use my referral to support my work
