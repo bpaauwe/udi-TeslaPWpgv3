@@ -296,7 +296,7 @@ if __name__ == "__main__":
         #LOGGER.info('Starting Tesla Power Wall Controller')
         polyglot = udi_interface.Interface([])
         polyglot.start()
-        TeslaPWController(polyglot, 'controller', 'controller', 'TeslaPWControl')
+        TeslaPWController(polyglot, 'controller', 'controller', 'TeslaPowerWall')
         polyglot.runForever()
     except (KeyboardInterrupt, SystemExit):
         sys.exit(0)
