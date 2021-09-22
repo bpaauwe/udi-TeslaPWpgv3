@@ -14,7 +14,7 @@ PG_CLOUD_ONLY = False
 
 
 import udi_interface
-LOGGER = polyinterface.LOGGER
+LOGGER = udi_interface.LOGGER
 
 #import LOGGER
 class TeslaCloudAPI():
