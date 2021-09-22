@@ -131,7 +131,7 @@ class TeslaPWController(udi_interface.Node):
                     self.poly.addNode(teslaPWSetupNode(self.poly, self.address, node, name))
                     #self.addNode(teslaPWSetupNode(self,self.address, node, name))
                 if node == self.TPW.getStatusNodeID():    
-                    self.addNode(teslaPWStatusNode(self,self.address, node, name))
+                    ##self.addNode(teslaPWStatusNode(self,self.address, node, name))
                     self.poly.addNode(teslaPWStatusNode(self.poly, self.address, node, name))
             LOGGER.debug('Node installation complete')
             self.nodeDefineDone = True
