@@ -67,36 +67,39 @@ class TeslaPWController(udi_interface.Node):
         self.localAccess = False
    
         # Wait for self.Parameters['access'] to be updated
-        while self.Parameters['access']  == 'LOCAL/CLOUD/BOTH':
-            time.sleep(2)
-            LOGGER.debug('Waiting for Access to be set ')
-       
+        if self.Parameters['access']  == 'LOCAL/CLOUD/BOTH':
+            self.Notices['access'] = 'access must be set to LOCAL CLOUD or BOTH'
+            LOGGER.debug('Access must be set ')
+            self.stop()
+           
         
         if self.Parameters['access'] == 'BOTH' or self.Parameters['access'] == 'CLOUD':
             # wait for user to set parameters
-            allKeysSet = False
-            while not(allKeysSet):
-                allKeysSet = True
-                for keys in self.defaultParams['CLOUD']:
-                    if self.Parameters[keys] ==  self.defaultParams['CLOUD'][keys]:
-                        allKeysSet = False
-                time.sleep(2)
-                LOGGER.debug('Waiting for CLOUD parameters to get set' )
-            self.cloudAccess = True
+            allKeysSet = True
+            for keys in self.defaultParams['CLOUD']:
+                if self.Parameters[keys] ==  self.defaultParams['CLOUD'][keys]:
+                    allKeysSet = False
+                    self.Notices[keys] =  str(keys) + 'not set'
+            if not allKeysSet:
+                 LOGGER.debug('Not or CLOUD parameters to get set' )
+                 self.stop()
+            else:
+                self.cloudAccess = True
             # All cloud keys defined
 
         if  self.Parameters['access'] == 'BOTH' or self.Parameters['access'] == 'LOCAL':
-            allKeysSet = False
-            while not(allKeysSet):
-                allKeysSet = True
-                for keys in self.defaultParams['LOCAL']:
-                    if self.Parameters[keys]==  self.defaultParams['LOCAL'][keys]:
-                        allKeysSet = False
-                time.sleep(2)
-                LOGGER.debug('Waiting for LOCAL parameters to get set' )
-            self.localAccess = True
+            allKeysSet = True
+            for keys in self.defaultParams['LOCAL']:
+                if self.Parameters[keys]==  self.defaultParams['LOCAL'][keys]:
+                    allKeysSet = False
+                    self.Notices[keys] =  str(keys) + 'not set'
+            if not allKeysSet:
+                 LOGGER.debug('Waiting for LOCAL parameters to get set' )
+                 self.stop()
+            else:
+                self.localAccess = True
             #all local keys defined
-        
+            
 
         LOGGER.debug('starting Login process')
         try:
