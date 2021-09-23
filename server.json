@@ -9,6 +9,7 @@
     "shortPoll": "60",
     "longPoll": "180",
     "profile_version": "0.0.1",
+    "logLevel":"DEBUG",
     "credits": [
         {
             "title": "A NodeServer to integrate Tesla Power Wall Controll system",

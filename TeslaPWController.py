@@ -221,11 +221,11 @@ class TeslaPWController(udi_interface.Node):
             if self.TPW.pollSystemData('critical'):
                 self.updateISYdrivers('critical')
                 #self.reportDrivers()
-                self.nodes = self.poly.getNodes()
-                for node in self.nodes:
+                #self.nodes = self.poly.getNodes()
+                for node in self.poly.nodes():
                     #LOGGER.debug('Node : ' + node)
-                    if node != self.address:
-                        self.nodes[node].shortPoll()
+                    if node.address != self.address:
+                        self.poly.nodes[node].shortPoll()
             else:
                 LOGGER.info('Problem polling data from Tesla system') 
         else:
@@ -241,11 +241,11 @@ class TeslaPWController(udi_interface.Node):
                 self.updateISYdrivers('all')
                 #self.reportDrivers() 
                 
-                self.nodes = self.poly.getNodes()
-                for node in self.nodes:
+                #self.nodes = self.poly.getNodes()
+                for node in self.poly.nodes():
                     #LOGGER.debug('Node : ' + node)
-                    if node != self.address:
-                        self.nodes[node].longPoll()
+                    if node.address != self.address:
+                        self.polynodes[node].longPoll()
             else:
                 LOGGER.error ('Problem polling data from Tesla system')
         else:
