@@ -81,7 +81,7 @@ class TeslaPWController(udi_interface.Node):
                     allKeysSet = False
                     self.Notices[keys] =  str(keys) + 'not set'
             if not allKeysSet:
-                 LOGGER.debug('Not or CLOUD parameters to get set' )
+                 LOGGER.debug('Not all CLOUD parameters are specified' )
                  self.stop()
             else:
                 self.cloudAccess = True
@@ -94,7 +94,7 @@ class TeslaPWController(udi_interface.Node):
                     allKeysSet = False
                     self.Notices[keys] =  str(keys) + 'not set'
             if not allKeysSet:
-                 LOGGER.debug('Waiting for LOCAL parameters to get set' )
+                 LOGGER.debug('Not all LOCAL parameters are specified' )
                  self.stop()
             else:
                 self.localAccess = True
