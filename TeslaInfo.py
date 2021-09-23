@@ -178,8 +178,9 @@ class tesla_info:
 
     def createISYsetup (self):
         self.setupNodeID = 'pwsetup' 
-        self.statusName = 'STATUS'
+        #self.statusName = 'STATUS'
         self.nodeServerUp = 'nodeServerUp'
+        self.pollSkip = 'pollSkip'
         self.setupNodeName = 'Control Parameters'
 
         self.statusNodeID = 'pwstatus'
@@ -230,8 +231,8 @@ class tesla_info:
         #self.isyINFO.addISYstatus(self.controllerID, self.statusName)
         self.isyINFO.addISYcommandSend(self.controllerID, 'DON')
         self.isyINFO.addISYcommandSend(self.controllerID, 'DOF')
-        self.isyINFO.addIsyVaraiable (self.controllerID, self.nodeServerUp, 'raw1bunsign',0, 255, None, None, 0, 'Missed LongPolls',  None) 
         self.isyINFO.addIsyVaraiable (self.controllerID, self.nodeServerUp, 'list', None,None, '0-1',None, None, 'Connected to Tesla Power Wall', { 0:'False', 1: 'True' } )
+        self.isyINFO.addIsyVaraiable (self.controllerID, self.pollSkip , 'raw1bunsign',0, 255, None, None, 0, 'Missed LongPolls',  None) 
         self.addISYCriticalParam(self.controllerID, self.nodeServerUp)
 
         self.isyINFO.addISYcommandReceive(self.controllerID, 'UPDATE', 'Update System Data', None)
@@ -577,7 +578,7 @@ class tesla_info:
                 return(self.getTPW_getTouData('weekday', 'peak', 'start'))   
             elif self.teslaVarName == self.weekdayPeakEndSec:
                 return(self.getTPW_getTouData('weekday', 'peak', 'stop'))   
-            elif (self.teslaVarName == self.nodeServerUp) or (self.teslaVarName ==  self.statusName):
+            elif (self.teslaVarName == self.nodeServerUp) or (self.teslaVarName ==  self.pollSkip) :
                 return(self.isNodeServerUp())
             else:
 

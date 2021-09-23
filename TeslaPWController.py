@@ -43,7 +43,7 @@ class TeslaPWController(udi_interface.Node):
         LOGGER.debug('self.name :' + str(self.name))
         self.hb = 0
         #if not(PG_CLOUD_ONLY):
-        #self.drivers = []
+        self.drivers = [{'driver': 'ST', 'value':0, 'uom':2}]
         #LOGGER.debug('MAIN ADDING DRIVER' + str(self.drivers))
         self.nodeDefineDone = False
         #self.setDriver('ST', 0, report = True, force = True)
@@ -259,28 +259,30 @@ class TeslaPWController(udi_interface.Node):
         else:
             LOGGER.info('Waiting for system/nodes to get created')
         
-
+    #Need to update to use variables 
     def updateISYdrivers(self, level):
         LOGGER.debug('System updateISYdrivers - ' + str(level))
         value = 1
         if level == 'all':
-            value = self.TPW.getISYvalue('GV3', self.address)
+            value = self.TPW.getISYvalue('GV2', self.address)
             if value == 0:
                 self.longPollCountMissed = self.longPollCountMissed + 1
             else:
                 self.longPollCountMissed = 0
+            self.setDriver('GV1', int(self.value), report = True, force = True)  
             self.setDriver('GV2', int(self.longPollCountMissed), report = True, force = True)     
-            LOGGER.debug('Update ISY drivers :' + str('GV2')+ '  value:' + str(self.longPollCountMissed) )
+            LOGGER.debug('Update ISY drivers : GV1  value:' + str(value) )
+            LOGGER.debug('Update ISY drivers : GV2  value:' + str(self.longPollCountMissed) )
         elif level == 'critical':
-            value = self.TPW.getISYvalue('GV3', self.address)
+            value = self.TPW.getISYvalue('GV1', self.address)
             #self.setDriver('ST', value, report = True, force = True)  
             #LOGGER.debug('Update ISY drivers :' + str('ST')+ '  value:' + str(value) )   
-            if value == 0:
-                self.longPollCountMissed = self.longPollCountMissed + 1
-            else:
-                self.longPollCountMissed = 0
-            self.setDriver('GV2', int(self.longPollCountMissed), report = True, force = True)   
-            LOGGER.debug('Update ISY drivers :' + str('GV2')+ '  value:' + str(self.longPollCountMissed) )
+            #if value == 0:
+            #    self.longPollCountMissed = self.longPollCountMissed + 1
+            #else:
+            #    self.longPollCountMissed = 0
+            self.setDriver('GV1', int(self.value), report = True, force = True)   
+            LOGGER.debug('Update ISY drivers : GV1  value:' + str(value) )
         else:
             LOGGER.error('Wrong parameter passed: ' + str(level))
  
@@ -298,11 +300,11 @@ class TeslaPWController(udi_interface.Node):
  
     commands = { 'UPDATE': ISYupdate }
 
-
+    '''
     drivers= [{'driver': 'ST', 'value':0, 'uom':2},
               {'driver': 'GV3', 'value':0, 'uom':25},
               {'driver': 'GV2', 'value':0, 'uom':107}]
-
+    '''
 
 if __name__ == "__main__":
     try:
