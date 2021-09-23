@@ -121,8 +121,16 @@ class TeslaPWController(udi_interface.Node):
             self.poly.Notices.clear()
             
             LOGGER.info('Creating Nodes')
-            nodeList = self.TPW.getNodeIdList()
+
+            self.ISYparams = self.TPW.supportedParamters(self.address)
+            for key in self.ISYparams:
+                info = self.ISYparams[key]
+                if info != {}:
+                    value = self.TPW.getISYvalue(key, self.id)
+                    LOGGER.debug('SetupNode: driver' + str(key)+ ' value:' + str(value) + ' uom:' + str(info['uom']) )
+                    self.drivers.append({'driver':key, 'value':value, 'uom':info['uom'] })
             
+            nodeList = self.TPW.getNodeIdList()
             for node in nodeList:
                 name = self.TPW.getNodeName(node)
                 LOGGER.debug('Setup Node(node, name, address) ' + str(node) + ' , '+ str(name) + ' , '+str(self.address))
