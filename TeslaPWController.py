@@ -267,7 +267,7 @@ class TeslaPWController(udi_interface.Node):
        
         if level == 'all':
             value = self.TPW.getISYvalue('GV2', self.address)
-            LOGGER.debug('value = ' + value)
+            LOGGER.debug('value = ' +str( value))
             if value == 0:
                 self.longPollCountMissed = self.longPollCountMissed + 1
             else:

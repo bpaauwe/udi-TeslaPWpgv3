@@ -87,7 +87,7 @@ class teslaPWStatusNode(udi_interface.Node):
         params = []
         if level == 'all':
             params = self.ISYparams
-            LOGGER.debug('Status Params = '+ params)
+            LOGGER.debug(params)
             if params:
                 for key in params:
                     info = params[key]
@@ -99,7 +99,7 @@ class teslaPWStatusNode(udi_interface.Node):
                         self.setDriver(key, value)      
         elif level == 'critical':
             params = self.ISYcriticalParams
-            LOGGER.debug('Status Params = '+ params)
+            LOGGER.debug(params)
             if params:
                 for key in params:
                     info = params[key]
