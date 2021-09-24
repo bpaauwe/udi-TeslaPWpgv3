@@ -46,8 +46,7 @@ class TeslaPWController(udi_interface.Node):
         self.drivers = [{'driver': 'ST', 'value':0, 'uom':2}]
         #LOGGER.debug('MAIN ADDING DRIVER' + str(self.drivers))
         self.nodeDefineDone = False
-        #self.setDriver('ST', 0, report = True, force = True)
-        #self.setDriver('GV2', 0, report = True, force = True)
+
         LOGGER.debug('Controller init DONE')
         self.longPollCountMissed = 0
         
@@ -123,14 +122,16 @@ class TeslaPWController(udi_interface.Node):
             LOGGER.info('Creating Nodes')
 
             self.ISYparams = self.TPW.supportedParamters(self.address)
-            LOGGER.debug('ISY params: '+ self.ISYparams)
+            LOGGER.debug(self.ISYparams)
             for key in self.ISYparams:
                 info = self.ISYparams[key]
                 if info != {}:
                     value = self.TPW.getISYvalue(key, self.address)
                     LOGGER.debug('Controller driver' + str(key)+ ' value:' + str(value) + ' uom:' + str(info['uom']) )
                     self.drivers.append({'driver':key, 'value':value, 'uom':info['uom'] })
-            
+                    
+            LOGGER.debug(self.drivers)
+
             nodeList = self.TPW.getNodeIdList()
             for node in nodeList:
                 name = self.TPW.getNodeName(node)
@@ -253,7 +254,7 @@ class TeslaPWController(udi_interface.Node):
                 self.nodes = self.poly.getNodes()
                 for node in self.nodes:
                     LOGGER.debug('Node : ' + node)
-                    if node.address != self.address:
+                    if node != self.address:
                         self.nodes[node].longPoll()
             else:
                 LOGGER.error ('Problem polling data from Tesla system')
@@ -263,15 +264,16 @@ class TeslaPWController(udi_interface.Node):
     #Need to update to use variables 
     def updateISYdrivers(self, level):
         LOGGER.debug('System updateISYdrivers - ' + str(level))
-        value = 1
+       
         if level == 'all':
             value = self.TPW.getISYvalue('GV2', self.address)
+            LOGGER.debug('value = ' + value)
             if value == 0:
                 self.longPollCountMissed = self.longPollCountMissed + 1
             else:
                 self.longPollCountMissed = 0
-            self.setDriver('GV1', int(self.value), report = True, force = True)  
-            self.setDriver('GV2', int(self.longPollCountMissed), report = True, force = True)     
+            self.setDriver('GV1', value )
+            self.setDriver('GV2', self.longPollCountMissed)     
             LOGGER.debug('Update ISY drivers : GV1  value:' + str(value) )
             LOGGER.debug('Update ISY drivers : GV2  value:' + str(self.longPollCountMissed) )
         elif level == 'critical':
@@ -282,7 +284,7 @@ class TeslaPWController(udi_interface.Node):
             #    self.longPollCountMissed = self.longPollCountMissed + 1
             #else:
             #    self.longPollCountMissed = 0
-            self.setDriver('GV1', int(self.value), report = True, force = True)   
+            self.setDriver('GV1', value)   
             LOGGER.debug('Update ISY drivers : GV1  value:' + str(value) )
         else:
             LOGGER.error('Wrong parameter passed: ' + str(level))

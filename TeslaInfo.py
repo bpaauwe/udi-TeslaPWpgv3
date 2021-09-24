@@ -178,7 +178,7 @@ class tesla_info:
 
     def createISYsetup (self):
         self.setupNodeID = 'pwsetup' 
-        #self.statusName = 'STATUS'
+        self.statusName = 'STATUS'
         self.nodeServerUp = 'nodeServerUp'
         self.pollSkip = 'pollSkip'
         self.setupNodeName = 'Control Parameters'
@@ -228,7 +228,7 @@ class tesla_info:
         self.yesterdayGenerator = 'yesterGenerator'
 
         self.isyINFO.addISYcontroller(self.controllerID, self.controllerName,'Electricity' )
-        #self.isyINFO.addISYstatus(self.controllerID, self.statusName)
+        self.isyINFO.addISYstatus(self.controllerID, self.statusName)
         self.isyINFO.addISYcommandSend(self.controllerID, 'DON')
         self.isyINFO.addISYcommandSend(self.controllerID, 'DOF')
         self.isyINFO.addIsyVaraiable (self.controllerID, self.nodeServerUp, 'list', None,None, '0-1',None, None, 'Connected to Tesla Power Wall', { 0:'False', 1: 'True' } )

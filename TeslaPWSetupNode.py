@@ -92,14 +92,14 @@ class teslaPWSetupNode(udi_interface.Node):
                     if info != {}:
                         value = self.TPW.getISYvalue(key, self.id)
                         #LOGGER.debug('Update ISY drivers :' + str(key)+ ' ' + info['systemVar']+ ' value:' + str(value) )
-                        self.setDriver(key, int(value), report = True, force = True)      
+                        self.setDriver(key, value)      
         elif level == 'critical':
             params = self.ISYcriticalParams
             if params:
                 for key in params:
                     value = self.TPW.getISYvalue(key, self.id)
                     #LOGGER.debug('Update ISY drivers :' + str(key)+ ' value: ' + str(value) )
-                    self.setDriver(key, int(value), report = True, force = True)        
+                    self.setDriver(key, value)        
 
         else:
            LOGGER.debug('Wrong parameter passed: ' + str(level))
@@ -112,7 +112,7 @@ class teslaPWSetupNode(udi_interface.Node):
         value = int(command.get('value'))
         self.TPW.setTPW_stormMode(value)
         ISYvar = self.TPW.getStormModeISYVar(self.id)
-        self.setDriver(ISYvar, value, report = True,force = True)
+        self.setDriver(ISYvar, value)
         #self.reportDrivers() 
         
     def setOperatingMode(self, command):
@@ -120,7 +120,7 @@ class teslaPWSetupNode(udi_interface.Node):
         value = int(command.get('value'))
         self.TPW.setTPW_operationMode(value)
         ISYvar = self.TPW.getOperatingModeISYVar(self.id)
-        self.setDriver(ISYvar, value, report = True,force = True)
+        self.setDriver(ISYvar, value)
         #self.reportDrivers() 
     
     def setBackupPercent(self, command):
@@ -128,7 +128,7 @@ class teslaPWSetupNode(udi_interface.Node):
         value = float(command.get('value'))
         self.TPW.setTPW_backoffLevel(value)
         ISYvar = self.TPW.getBackupPercentISYVar(self.id)
-        self.setDriver(ISYvar, value, report = True,force = True)
+        self.setDriver(ISYvar, value)
         #self.reportDrivers() 
 
     def setTOUmode(self, command):
@@ -136,7 +136,7 @@ class teslaPWSetupNode(udi_interface.Node):
         value = int(command.get('value'))
         self.TPW.setTPW_touMode(value)
         ISYvar = self.TPW.getTOUmodeISYVar(self.id)
-        self.setDriver(ISYvar, value, report = True,force = True)
+        self.setDriver(ISYvar, value)
         #self.reportDrivers() 
 
     def setWeekendOffpeakStart(self, command):
@@ -144,7 +144,7 @@ class teslaPWSetupNode(udi_interface.Node):
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('off_peak', 'weekend', 'start', value)
         ISYvar = self.TPW.getTouWeekendOffpeakStartISYVar(self.id)
-        self.setDriver(ISYvar, value, report = True,force = True)
+        self.setDriver(ISYvar, value)
         #self.reportDrivers() 
 
     def setWeekendOffpeakEnd(self, command):
@@ -152,7 +152,7 @@ class teslaPWSetupNode(udi_interface.Node):
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('off_peak', 'weekend', 'end', value)
         ISYvar = self.TPW.getTouWeekendOffpeakEndISYVar(self.id)
-        self.setDriver(ISYvar, value, report = True,force = True)
+        self.setDriver(ISYvar, value)
         #self.reportDrivers() 
 
     def setWeekendPeakStart(self, command):
@@ -160,7 +160,7 @@ class teslaPWSetupNode(udi_interface.Node):
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('peak', 'weekend', 'start', value)
         ISYvar = self.TPW.getTouWeekendPeakStartISYVar(self.id)
-        self.setDriver(ISYvar, value, report = True,force = True)
+        self.setDriver(ISYvar, value)
         #self.reportDrivers()       
 
     def setWeekendPeakEnd(self, command):
@@ -168,7 +168,7 @@ class teslaPWSetupNode(udi_interface.Node):
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('peak', 'weekend', 'end', value)
         ISYvar = self.TPW.getTouWeekendPeakEndISYVar(self.id)
-        self.setDriver(ISYvar, value, report = True,force = True)
+        self.setDriver(ISYvar, value)
         #self.reportDrivers()    
 
     def setWeekOffpeakStart(self, command):
@@ -176,7 +176,7 @@ class teslaPWSetupNode(udi_interface.Node):
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('off_peak', 'week', 'start', value)
         ISYvar = self.TPW.getTouWeekOffpeakStartISYVar(self.id)
-        self.setDriver(ISYvar, value, report = True,force = True)
+        self.setDriver(ISYvar, value)
         #self.reportDrivers() 
 
     def setWeekOffpeakEnd(self, command):
@@ -184,7 +184,7 @@ class teslaPWSetupNode(udi_interface.Node):
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('off_peak', 'week', 'end', value)
         ISYvar = self.TPW.getTouWeekOffpeakEndISYVar(self.id)
-        self.setDriver(ISYvar, value, report = True,force = True)
+        self.setDriver(ISYvar, value)
         #self.reportDrivers() 
 
     def setWeekPeakStart(self, command):
@@ -192,7 +192,7 @@ class teslaPWSetupNode(udi_interface.Node):
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('peak', 'week', 'start', value)
         ISYvar = self.TPW.getTouWeekPeakStartISYVar(self.id)
-        self.setDriver(ISYvar, value, report = True,force = True)
+        self.setDriver(ISYvar, value)
         #self.reportDrivers()   
 
     def setWeekPeakEnd(self, command):
@@ -200,7 +200,7 @@ class teslaPWSetupNode(udi_interface.Node):
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('peak', 'week', 'end', value)
         ISYvar = self.TPW.getTouWeekPeakEndISYVar(self.id)
-        self.setDriver(ISYvar, value, report = True,force = True)
+        self.setDriver(ISYvar, value)
         #self.reportDrivers() 
 
 
