@@ -21,7 +21,6 @@ class teslaPWStatusNode(udi_interface.Node):
         self.ISYforced = False
         self.TPW = TPW
         self.address = address 
-        self.address = address
         self.name = name
         self.hb = 0
 
@@ -49,8 +48,10 @@ class teslaPWStatusNode(udi_interface.Node):
                 LOGGER.debug('StatusNode: driver ' + str(key)+ ' value:' + str(value) + ' uom:' + str(info['uom']) )
                 self.drivers.append({'driver':key, 'value':value, 'uom':info['uom'] })
         LOGGER.debug( 'Status node init - DONE')
+        LOGGER.debug (self.drivers)
+        self.poly.updateProfile()
 
-
+        
     def start(self):                
         self.updateISYdrivers('all')
         #self.reportDrivers()
@@ -87,27 +88,23 @@ class teslaPWStatusNode(udi_interface.Node):
         params = []
         if level == 'all':
             params = self.ISYparams
-            LOGGER.debug(params)
+            #LOGGER.debug(params)
             if params:
                 for key in params:
                     info = params[key]
-                    LOGGER.debug( key, info)
+                    LOGGER.debug('all Update Driver, key, info '+ str( key) + ' ,' + str( info['systemVar']))
                     if info != {}:
-                            
                         value = self.TPW.getISYvalue(key, self.address)
-                        LOGGER.debug('Update all ISY drivers :' + str(key)+ ' ' + info['systemVar']+ ' value:' + str(value) )
+                        LOGGER.debug('STATUS Update all ISY drivers :' + str(key)+  ' value:' + str(value) )
                         self.setDriver(key, value)      
         elif level == 'critical':
             params = self.ISYcriticalParams
             LOGGER.debug(params)
             if params:
                 for key in params:
-                    info = params[key]
-                    LOGGER.debug( key, info)
-                    if info != {}:
-                        value = self.TPW.getISYvalue(key, self.address)
-                        #LOGGER.debug('Update critical ISY drivers :' + str(key)+ ' value: ' + str(value) )
-                        self.setDriver(key, value)        
+                    value = self.TPW.getISYvalue(key, self.address)
+                    LOGGER.debug('STATUS Update critical ISY drivers :' + str(key)+ ' value: ' + str(value) )
+                    self.setDriver(key, value)        
 
         else:
            LOGGER.error('Wrong parameter passed: ' + str(level))

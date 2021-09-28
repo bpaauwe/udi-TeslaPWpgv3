@@ -43,7 +43,8 @@ class TeslaPWController(udi_interface.Node):
         LOGGER.debug('self.name :' + str(self.name))
         self.hb = 0
         #if not(PG_CLOUD_ONLY):
-        self.drivers = [{'driver': 'ST', 'value':0, 'uom':2}]
+        #self.drivers = [{'driver': 'ST', 'value':0, 'uom':2}]
+        self.drivers = []
         #LOGGER.debug('MAIN ADDING DRIVER' + str(self.drivers))
         self.nodeDefineDone = False
 
@@ -122,6 +123,8 @@ class TeslaPWController(udi_interface.Node):
             LOGGER.info('Creating Nodes')
 
             self.ISYparams = self.TPW.supportedParamters(self.address)
+            self.ISYcriticalParams = self.TPW.criticalParamters(self.address)
+
             LOGGER.debug(self.ISYparams)
             for key in self.ISYparams:
                 info = self.ISYparams[key]
@@ -147,7 +150,8 @@ class TeslaPWController(udi_interface.Node):
             self.nodeDefineDone = True
             LOGGER.debug('updateISYdrivers')
             self.updateISYdrivers('all')
-            self.longPoll() # Update all drivers
+
+            #self.longPoll() # Update all drivers
 
         except Exception as e:
             LOGGER.error('Exception Controller start: '+ str(e))
@@ -218,10 +222,10 @@ class TeslaPWController(udi_interface.Node):
         
     def systemPoll(self, pollList):
         LOGGER.debug('systemPoll')
-        if 'shortPoll' in pollList:
-            self.shortPoll()
         if 'longPoll' in pollList:
             self.longPoll()
+        elif 'shortPoll' in pollList:
+            self.shortPoll()
 
 
     def shortPoll(self):
@@ -243,6 +247,12 @@ class TeslaPWController(udi_interface.Node):
         
 
     def longPoll(self):
+        self.ISYparams = self.TPW.supportedParamters(self.address)
+        #LOGGER.debug( self.ISYparams)
+        self.ISYcriticalParams = self.TPW.criticalParamters(self.address)
+
+
+
         LOGGER.info('Tesla Power Wall  Controller longPoll')
         if self.nodeDefineDone:
             #self.heartbeat()
@@ -263,29 +273,21 @@ class TeslaPWController(udi_interface.Node):
         
     #Need to update to use variables 
     def updateISYdrivers(self, level):
-        LOGGER.debug('System updateISYdrivers - ' + str(level))
-       
+        LOGGER.debug('System updateISYdrivers - ' + str(level))       
         if level == 'all':
             value = self.TPW.getISYvalue('GV2', self.address)
-            LOGGER.debug('value = ' +str( value))
             if value == 0:
-                self.longPollCountMissed = self.longPollCountMissed + 1
+               self.longPollCountMissed = self.longPollCountMissed + 1
             else:
-                self.longPollCountMissed = 0
-            self.setDriver('GV1', value )
-            self.setDriver('GV2', self.longPollCountMissed)     
-            LOGGER.debug('Update ISY drivers : GV1  value:' + str(value) )
-            LOGGER.debug('Update ISY drivers : GV2  value:' + str(self.longPollCountMissed) )
+               self.longPollCountMissed = 0
+            self.setDriver('GV2', value )
+            self.setDriver('GV3', self.longPollCountMissed)     
+            LOGGER.debug('CTRL Update ISY drivers : GV2  value:' + str(value) )
+            LOGGER.debug('CTRL Update ISY drivers : GV3  value:' + str(self.longPollCountMissed) )
         elif level == 'critical':
-            value = self.TPW.getISYvalue('GV1', self.address)
-            #self.setDriver('ST', value, report = True, force = True)  
-            #LOGGER.debug('Update ISY drivers :' + str('ST')+ '  value:' + str(value) )   
-            #if value == 0:
-            #    self.longPollCountMissed = self.longPollCountMissed + 1
-            #else:
-            #    self.longPollCountMissed = 0
-            self.setDriver('GV1', value)   
-            LOGGER.debug('Update ISY drivers : GV1  value:' + str(value) )
+            value = self.TPW.getISYvalue('GV2', self.address)
+            self.setDriver('GV2', value)   
+            LOGGER.debug('CTRL Update ISY drivers : GV2  value:' + str(value) )
         else:
             LOGGER.error('Wrong parameter passed: ' + str(level))
  
