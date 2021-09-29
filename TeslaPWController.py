@@ -36,8 +36,8 @@ class TeslaPWController(udi_interface.Node):
        
         self.poly.subscribe(self.poly.POLL, self.systemPoll)
 
-        self.poly.ready()
-        self.poly.addNode(self)
+        #self.poly.ready()
+        #self.poly.addNode(self)
  
         LOGGER.debug('self.address : ' + str(self.address))
         LOGGER.debug('self.name :' + str(self.name))
@@ -54,6 +54,10 @@ class TeslaPWController(udi_interface.Node):
         self.defaultParams = {  'CLOUD':  { } ,
                                 'LOCAL':  { },
                             }   
+
+        self.poly.ready()
+        self.poly.addNode(self)
+
 
     def start(self):
        
@@ -113,13 +117,14 @@ class TeslaPWController(udi_interface.Node):
 
             self.TPW.teslaInitializeData()
             self.TPW.pollSystemData('all')          
-     
+            self.ISYparams = self.TPW.supportedParamters(self.address)
+            #LOGGER.debug( self.ISYparams)
+            self.ISYcriticalParams = self.TPW.criticalParamters(self.address)
+
             if self.Parameters['LOGFILE'] == 'ENABLED':
                 self.TPW.createLogFile(self.logFile)
             
-            self.poly.updateProfile()
-            self.poly.Notices.clear()
-            
+                     
             LOGGER.info('Creating Nodes')
 
             self.ISYparams = self.TPW.supportedParamters(self.address)
@@ -132,9 +137,13 @@ class TeslaPWController(udi_interface.Node):
                     value = self.TPW.getISYvalue(key, self.address)
                     LOGGER.debug('Controller driver' + str(key)+ ' value:' + str(value) + ' uom:' + str(info['uom']) )
                     self.drivers.append({'driver':key, 'value':value, 'uom':info['uom'] })
-                    
+            LOGGER.debug('Drivers:')        
             LOGGER.debug(self.drivers)
+            
+            self.poly.updateProfile()
+            self.poly.Notices.clear()
 
+            
             nodeList = self.TPW.getNodeIdList()
             for node in nodeList:
                 name = self.TPW.getNodeName(node)
@@ -201,7 +210,6 @@ class TeslaPWController(udi_interface.Node):
     #def handleNotifications(self):
         
 
-    
     def stop(self):
         #self.removeNoticesAll()
         if self.TPW:
@@ -247,11 +255,6 @@ class TeslaPWController(udi_interface.Node):
         
 
     def longPoll(self):
-        self.ISYparams = self.TPW.supportedParamters(self.address)
-        #LOGGER.debug( self.ISYparams)
-        self.ISYcriticalParams = self.TPW.criticalParamters(self.address)
-
-
 
         LOGGER.info('Tesla Power Wall  Controller longPoll')
         if self.nodeDefineDone:
