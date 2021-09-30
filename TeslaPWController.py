@@ -56,7 +56,9 @@ class TeslaPWController(udi_interface.Node):
                             }   
 
         self.poly.ready()
-        self.poly.addNode(self)
+
+
+        
 
 
     def start(self):
@@ -141,6 +143,7 @@ class TeslaPWController(udi_interface.Node):
             LOGGER.debug(self.drivers)
             
             self.poly.updateProfile()
+            self.poly.addNode(self)
             self.poly.Notices.clear()
 
             
