@@ -28,14 +28,12 @@ class TeslaPWController(udi_interface.Node):
 
         self.poly.subscribe(self.poly.START, self.start, address)
         self.poly.subscribe(self.poly.LOGLEVEL, self.handleLevelChange)
-
-        self.Parameters = Custom(polyglot, 'customparams')
         self.poly.subscribe(self.poly.CUSTOMPARAMS, self.handleParams)
-
-        self.Notices = Custom(polyglot, 'notices')
-       
         self.poly.subscribe(self.poly.POLL, self.systemPoll)
 
+        self.Parameters = Custom(polyglot, 'customparams')
+        self.Notices = Custom(polyglot, 'notices')
+       
         #self.poly.ready()
         #self.poly.addNode(self)
  
@@ -43,8 +41,8 @@ class TeslaPWController(udi_interface.Node):
         LOGGER.debug('self.name :' + str(self.name))
         self.hb = 0
         #if not(PG_CLOUD_ONLY):
-        #self.drivers = [{'driver': 'ST', 'value':0, 'uom':2}]
-        self.drivers = []
+        self.drivers = [{'driver': 'ST', 'value':0, 'uom':2}, {'driver': 'GV2', 'value':0, 'uom':25}, {'driver': 'GV3', 'value':0, 'uom':107}]
+        #self.drivers = []
         #LOGGER.debug('MAIN ADDING DRIVER' + str(self.drivers))
         self.nodeDefineDone = False
 
@@ -56,9 +54,7 @@ class TeslaPWController(udi_interface.Node):
                             }   
 
         self.poly.ready()
-
-
-        
+        self.poly.addNode(self)
 
 
     def start(self):
@@ -66,20 +62,22 @@ class TeslaPWController(udi_interface.Node):
         LOGGER.debug('start')
         #self.poly.setCustomParamsDoc()
         self.Notices['start'] = 'Check Configuration to make sure all relevant parameters are set'
-        self.checkParameters()
         #self.poly.Notices.clear()
         #self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
         self.cloudAccess = False
         self.localAccess = False
    
-        # Wait for self.Parameters['access'] to be updated
-        if self.Parameters['access']  == 'LOCAL/CLOUD/BOTH':
-            self.Notices['access'] = 'access must be set to LOCAL CLOUD or BOTH'
-            LOGGER.debug('Access must be set ')
-            self.stop()
+        # Wait for self.Parameters['ACCESS'] to be updated
+        if 'ACCESS' in self.Parameters:
+            if self.Parameters['ACCESS']  == 'LOCAL/CLOUD/BOTH':
+                self.Notices['ACCESS'] = 'access must be set to LOCAL CLOUD or BOTH'
+                LOGGER.debug('ACCESS must be set ')
+                self.stop()
+        else:
+            self.checkParameters()
            
         
-        if self.Parameters['access'] == 'BOTH' or self.Parameters['access'] == 'CLOUD':
+        if self.Parameters['ACCESS'] == 'BOTH' or self.Parameters['ACCESS'] == 'CLOUD':
             # wait for user to set parameters
             allKeysSet = True
             for keys in self.defaultParams['CLOUD']:
@@ -88,12 +86,13 @@ class TeslaPWController(udi_interface.Node):
                     self.Notices[keys] =  str(keys) + 'not set'
             if not allKeysSet:
                  LOGGER.debug('Not all CLOUD parameters are specified' )
+                 self.checkParameters()
                  self.stop()
             else:
                 self.cloudAccess = True
             # All cloud keys defined
 
-        if  self.Parameters['access'] == 'BOTH' or self.Parameters['access'] == 'LOCAL':
+        if  self.Parameters['ACCESS'] == 'BOTH' or self.Parameters['ACCESS'] == 'LOCAL':
             allKeysSet = True
             for keys in self.defaultParams['LOCAL']:
                 if self.Parameters[keys]==  self.defaultParams['LOCAL'][keys]:
@@ -101,6 +100,7 @@ class TeslaPWController(udi_interface.Node):
                     self.Notices[keys] =  str(keys) + 'not set'
             if not allKeysSet:
                  LOGGER.debug('Not all LOCAL parameters are specified' )
+                 self.checkParameters()
                  self.stop()
             else:
                 self.localAccess = True
@@ -109,7 +109,7 @@ class TeslaPWController(udi_interface.Node):
 
         LOGGER.debug('starting Login process')
         try:
-            self.TPW = tesla_info(self.name, self.address, self.Parameters['access'])
+            self.TPW = tesla_info(self.name, self.address, self.Parameters['ACCESS'])
             #self.poly.Notices.clear()
             if self.localAccess:
                 self.TPW.loginLocal(self.Parameters['LOCAL_USER_EMAIL'], self.Parameters['LOCAL_USER_PASSWORD'], self.Parameters['IP_ADDRESS'])
@@ -131,7 +131,7 @@ class TeslaPWController(udi_interface.Node):
 
             self.ISYparams = self.TPW.supportedParamters(self.address)
             self.ISYcriticalParams = self.TPW.criticalParamters(self.address)
-
+            '''
             LOGGER.debug(self.ISYparams)
             for key in self.ISYparams:
                 info = self.ISYparams[key]
@@ -141,9 +141,8 @@ class TeslaPWController(udi_interface.Node):
                     self.drivers.append({'driver':key, 'value':value, 'uom':info['uom'] })
             LOGGER.debug('Drivers:')        
             LOGGER.debug(self.drivers)
-            
+            '''
             self.poly.updateProfile()
-            self.poly.addNode(self)
             self.poly.Notices.clear()
 
             
@@ -177,11 +176,11 @@ class TeslaPWController(udi_interface.Node):
     def handleParams (self, userParam ):
         LOGGER.debug('handleParams')
         self.Parameters.load(userParam)
-        self.checkParameters()
+        
         
     def checkParameters(self):
-        if self.Parameters['access'] is None:
-            self.Parameters['access'] = 'LOCAL/CLOUD/BOTH'
+        if self.Parameters['ACCESS'] is None:
+            self.Parameters['ACCESS'] = 'LOCAL/CLOUD/BOTH'
              
         if self.Parameters['LOCAL_USER_EMAIL'] is None:
             self.Parameters['LOCAL_USER_EMAIL'] = 'me@localPowerwall.com'
