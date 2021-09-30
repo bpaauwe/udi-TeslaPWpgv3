@@ -48,6 +48,7 @@ class teslaPWSetupNode(udi_interface.Node):
         LOGGER.debug( 'Setup node init - DONE')
         LOGGER.debug (self.drivers)
         self.poly.updateProfile()
+        self.poly.ready()
         #self.heartbeat()
 
 

@@ -41,7 +41,7 @@ class TeslaPWController(udi_interface.Node):
         LOGGER.debug('self.name :' + str(self.name))
         self.hb = 0
         #if not(PG_CLOUD_ONLY):
-        self.drivers = [{'driver': 'ST', 'value':0, 'uom':2}, {'driver': 'GV2', 'value':0, 'uom':25}, {'driver': 'GV3', 'value':0, 'uom':107}]
+        
         #self.drivers = []
         #LOGGER.debug('MAIN ADDING DRIVER' + str(self.drivers))
         self.nodeDefineDone = False
@@ -145,22 +145,27 @@ class TeslaPWController(udi_interface.Node):
             self.poly.updateProfile()
             self.poly.Notices.clear()
 
-            
+            '''
             nodeList = self.TPW.getNodeIdList()
             for node in nodeList:
                 name = self.TPW.getNodeName(node)
                 LOGGER.debug('Adding Node(node, name, address) ' + str(node) + ' , '+ str(name) + ' , '+str(self.address))
                 if node == self.TPW.getSetupNodeID():  
-                    self.poly.addNode(teslaPWSetupNode(self.poly, self.address, node, name, self.TPW))
+                    setupNode = teslaPWSetupNode((self.poly, self.address, node, name, self.TPW))
+                    self.poly.addNode(setupNode)
+                    #self.poly.addNode(teslaPWSetupNode(self.poly, self.address, node, name, self.TPW))
                     #self.addNode(teslaPWSetupNode(self,self.address, node, name))
                 if node == self.TPW.getStatusNodeID():    
                     ##self.addNode(teslaPWStatusNode(self,self.address, node, name))
-                    self.poly.addNode(teslaPWStatusNode(self.poly, self.address, node, name, self.TPW))
-
+                    ctrlNode = teslaPWStatusNode(self.poly, self.address, node, name, self.TPW)
+                    self.poly.addNode(ctrlNode)
+                    #self.poly.addNode(teslaPWStatusNode(self.poly, self.address, node, name, self.TPW))
+            '''
             LOGGER.debug('Node installation complete')
             self.nodeDefineDone = True
             LOGGER.debug('updateISYdrivers')
             self.updateISYdrivers('all')
+            
 
             #self.longPoll() # Update all drivers
 
@@ -216,7 +221,7 @@ class TeslaPWController(udi_interface.Node):
         #self.removeNoticesAll()
         if self.TPW:
             self.TPW.disconnectTPW()
-        
+        self.setDriver('ST', 0 )
         LOGGER.debug('stop - Cleaning up')
 
 
@@ -309,7 +314,7 @@ class TeslaPWController(udi_interface.Node):
                     self.nodes[node].longPoll()
  
     commands = { 'UPDATE': ISYupdate }
-
+    drivers = [{'driver': 'ST', 'value':0, 'uom':2}, {'driver': 'GV2', 'value':0, 'uom':25}, {'driver': 'GV3', 'value':0, 'uom':107}]
     '''
     drivers= [{'driver': 'ST', 'value':0, 'uom':2},
               {'driver': 'GV3', 'value':0, 'uom':25},
