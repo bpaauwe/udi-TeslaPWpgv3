@@ -314,7 +314,7 @@ class TeslaPWController(udi_interface.Node):
                     self.nodes[node].longPoll()
  
     commands = { 'UPDATE': ISYupdate }
-    drivers = [{'driver': 'ST', 'value':0, 'uom':2}, {'driver': 'GV2', 'value':0, 'uom':25}, {'driver': 'GV3', 'value':0, 'uom':107}]
+    drivers = [{'driver': 'ST', 'value':0, 'uom':2}, {'driver': 'GV2', 'value':0, 'uom':25}, {'driver': 'GV3', 'value':0, 'uom':71}]
     '''
     drivers= [{'driver': 'ST', 'value':0, 'uom':2},
               {'driver': 'GV3', 'value':0, 'uom':25},
