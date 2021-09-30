@@ -17,7 +17,7 @@ class isyHandling:
         #self.systemName = systemName
         LOGGER.debug('isyProfile - init')
         self.sData  = {}
-        self.ISYunit = {'boolean':2, 'list':25, 'kw':30, 'kwh':33, 'percent':51, 'durationsec':58, 'raw1bunsign': 107, 'raw2bunsign':108}  #need to be lower case 
+        self.ISYunit = {'boolean':2, 'list':25, 'kw':30, 'kwh':33, 'percent':51, 'durationsec':58, 'usernumber':70, 'raw1bunsign': 107, 'raw2bunsign':108}  #need to be lower case 
         self.nodeCount = 0
         self.setupFile = { 'nodeDef':{}
                             ,'editors':{}
