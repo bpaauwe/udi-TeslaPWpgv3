@@ -227,6 +227,7 @@ class tesla_info:
         self.yesterdayGridServices = 'yesterdayGridServices'
         self.yesterdayGenerator = 'yesterGenerator'
 
+        # ## CONTROLLER Node ##
         self.isyINFO.addISYcontroller(self.controllerID, self.controllerName,'Electricity' )
         self.isyINFO.addISYstatus(self.controllerID, self.statusName)
         self.isyINFO.addISYcommandSend(self.controllerID, 'DON')
@@ -238,6 +239,7 @@ class tesla_info:
         self.isyINFO.addISYcommandReceive(self.controllerID, 'UPDATE', 'Update System Data', None)
         #self.isyINFO.addControllerDefStruct(self.controllerID, self.controllerName )
 
+        # ## Status Node ##
         self.isyINFO.addISYnode(self.statusNodeID, self.statusNodeName, 'Electricity')
         self.isyINFO.addISYcommandReceive(self.statusNodeID, 'UPDATE', 'Update System Data', None)
 
@@ -277,6 +279,7 @@ class tesla_info:
         self.addISYCriticalParam(self.statusNodeID, self.operationMode)
 
 
+        # ## Setup Node ##
         if self.TPWcloudAccess:
             self.isyINFO.addISYnode(self.setupNodeID, self.setupNodeName, 'Electricity')
 

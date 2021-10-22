@@ -10,6 +10,15 @@
     "longPoll": "180",
     "profile_version": "0.0.2",
     "logLevel":"DEBUG",
+	"customParams": {
+		"LOCAL_IP_ADDRESS": "",
+		"LOCAL_USER_EMAIL": "",
+		"LOCAL_USER_PASSWORD": "",
+		"CLOUD_USER_EMAIL": "",
+		"CLOUD_USER_PASSWORD": "",
+		"CLOUD_CAPTCHA_APIKEY": "",
+		"LOGFILE": "DISABLED"
+	},
     "credits": [
         {
             "title": "A NodeServer to integrate Tesla Power Wall Controll system",

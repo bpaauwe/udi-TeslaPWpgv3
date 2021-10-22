@@ -50,7 +50,7 @@ class teslaPWStatusNode(udi_interface.Node):
         LOGGER.debug( 'Status node init - DONE')
         LOGGER.debug (self.drivers)
         self.poly.updateProfile()
-        self.poly.ready()
+        # NO! self.poly.ready()
         
     def start(self):                
         self.updateISYdrivers('all')
