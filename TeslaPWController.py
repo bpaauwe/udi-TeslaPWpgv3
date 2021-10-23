@@ -62,7 +62,7 @@ class TeslaPWController(udi_interface.Node):
        
         LOGGER.debug('start')
         #self.poly.setCustomParamsDoc()
-        self.Notices['start'] = 'Check Configuration to make sure all relevant parameters are set'
+        #self.Notices['start'] = 'Check Configuration to make sure all relevant parameters are set'
         #self.poly.Notices.clear()
         #self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
 
@@ -235,8 +235,8 @@ class TeslaPWController(udi_interface.Node):
             self.poly.Notices['cp'] = 'Missing Cloud User Password parameter'
             cloud_password = ''
 
-        if 'CLOUD_CAPTCH_APIKEY' in userParam:
-            cloud_kdy = userParam['CLOUD_CAPTCH_APIKEY']
+        if 'CLOUD_CAPTCHA_APIKEY' in userParam:
+            cloud_kdy = userParam['CLOUD_CAPTCHA_APIKEY']
         else:
             self.poly.Notices['ck'] = 'Missing Cloud Captch API Key parameter'
             cloud_key = ''
