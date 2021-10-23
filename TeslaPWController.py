@@ -241,7 +241,7 @@ class TeslaPWController(udi_interface.Node):
             cloud_password = ''
 
         if 'CLOUD_CAPTCHA_APIKEY' in userParam:
-            cloud_kdy = userParam['CLOUD_CAPTCHA_APIKEY']
+            cloud_key = userParam['CLOUD_CAPTCHA_APIKEY']
         else:
             self.poly.Notices['ck'] = 'Missing Cloud Captch API Key parameter'
             cloud_key = ''
