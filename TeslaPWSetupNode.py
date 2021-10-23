@@ -157,6 +157,7 @@ class teslaPWSetupNode(udi_interface.Node):
             #self.reportDrivers()
  
 
+    id = 'pwsetup'
     commands = { 'UPDATE': ISYupdate
                 ,'BACKUP_PCT' : setBackupPercent
                 ,'STORM_MODE' :setStormMode

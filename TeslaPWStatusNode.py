@@ -63,6 +63,7 @@ class teslaPWStatusNode(udi_interface.Node):
             #self.reportDrivers()
  
 
+    id = 'pwstatus'
     commands = { 'UPDATE': ISYupdate, 
                 }
 

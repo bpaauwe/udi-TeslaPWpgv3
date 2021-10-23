@@ -48,9 +48,9 @@ class teslaPWSolarNode(udi_interface.Node):
             #self.reportDrivers()
  
 
+    id = 'pwsolar'
     commands = { 'UPDATE': ISYupdate, 
                 }
-
 
     drivers = [
             {'driver': 'GV1', 'value': 0, 'uom': 33},  #Current solar supply

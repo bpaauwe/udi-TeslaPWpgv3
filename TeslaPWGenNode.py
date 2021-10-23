@@ -43,9 +43,9 @@ class teslaPWGenNode(udi_interface.Node):
             self.updateISYdrivers('all')
  
 
+    id = 'pwgenerator'
     commands = { 'UPDATE': ISYupdate, 
                 }
-
 
     drivers = [
             {'driver': 'GV1', 'value': 0, 'uom': 33},  #generator today

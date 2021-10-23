@@ -134,7 +134,7 @@ class TeslaPWController(udi_interface.Node):
 
             if self.TPW.generatorInstalled:
                 if not self.poly.getNode('genstatus'):
-                    node = teslaGeneratorNode(self.poly, self.address, 'genstatus', 'Generator Status', self.TPW)
+                    node = teslaGenNode(self.poly, self.address, 'genstatus', 'Generator Status', self.TPW)
                     self.poly.addNode(node)
             else:
                 self.poly.delNode('genstatus')
@@ -379,6 +379,7 @@ class TeslaPWController(udi_interface.Node):
                 if node != self.address :
                     self.nodes[node].longPoll()
  
+    id = 'controller'
     commands = { 'UPDATE': ISYupdate }
     drivers = [
             {'driver': 'ST', 'value':0, 'uom':2},
