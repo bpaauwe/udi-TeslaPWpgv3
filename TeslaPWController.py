@@ -247,6 +247,7 @@ class TeslaPWController(udi_interface.Node):
             cloud_key = ''
 
         if local_email != '' or local_password != '' or local_ip != '':
+            LOGGER.debug('local access true, cfg = {} {} {}'.format(local_email, local_password, local_ip))
             local_valid = True
             if local_email == '':
                 self.poly.Notices['lu'] = 'Please enter the local user name'
@@ -260,6 +261,7 @@ class TeslaPWController(udi_interface.Node):
 
 
         if cloud_email != '' or cloud_password != '' or cloud_key != '':
+            LOGGER.debug('cloud access true, cfg = {} {} {}'.format(cloud_email, cloud_password, cloud_key))
             cloud_valid = True
             if cloud_email == '':
                 self.poly.Notices['cu'] = 'Please enter the cloud user name'
@@ -281,7 +283,11 @@ class TeslaPWController(udi_interface.Node):
 
         if cloud_valid or local_valid:
             self.tesla_initialize(local_email, local_password, local_ip, cloud_email, cloud_password, cloud_key)
-        
+
+        if not cloud_valid and not local_valid:
+            self.poly.Notices['cfg'] = 'Tesla PowerWall NS needs configuration.'
+
+        LOGGER.debug('done with parameter processing')
         
     def stop(self):
         #self.removeNoticesAll()
