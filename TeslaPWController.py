@@ -86,7 +86,12 @@ class TeslaPWController(udi_interface.Node):
             self.TPW = tesla_info(self.name, self.address, self.Parameters['ACCESS'])
             #self.poly.Notices.clear()
             if self.localAccess:
-                self.TPW.loginLocal(local_email, local_password, local_ip)
+                LOGGER.debug('Attempting to log in via local auth')
+                try:
+                    self.TPW.loginLocal(local_email, local_password, local_ip)
+                except:
+                    LOGGER.error('local authenticated failed.')
+                    self.localAccess = False
                 #self.Parameters['LOCAL_USER_EMAIL'], self.Parameters['LOCAL_USER_PASSWORD'], self.Parameters['IP_ADDRESS'])
             if self.cloudAccess:
                 self.TPW.loginCloud(cloud_email, cloud_password, cloud_key)
@@ -182,8 +187,8 @@ class TeslaPWController(udi_interface.Node):
         except Exception as e:
             LOGGER.error('Exception Controller start: '+ str(e))
             LOGGER.info('Did not connect to power wall')
-            self.stop()
-        LOGGER.debug ('Controler - start done')
+
+        LOGGER.debug ('Controller - initialization done')
 
     def handleLevelChange(self, level):
         LOGGER.info('New log level: {}'.format(level))
