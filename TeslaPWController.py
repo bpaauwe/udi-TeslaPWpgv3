@@ -29,6 +29,7 @@ class TeslaPWController(udi_interface.Node):
         self.address = address
         self.cloudAccess = False
         self.localAccess = False
+        self.initialized = False
 
         self.poly.subscribe(self.poly.START, self.start, address)
         self.poly.subscribe(self.poly.LOGLEVEL, self.handleLevelChange)
@@ -64,6 +65,10 @@ class TeslaPWController(udi_interface.Node):
         self.Notices['start'] = 'Check Configuration to make sure all relevant parameters are set'
         #self.poly.Notices.clear()
         #self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
+
+        # Wait for things to initialize....
+        while not self.initialized:
+            time.sleep(1)
 
         # Poll for current values (and update nodes??)
         self.TPW.pollSystemData('all')          
@@ -167,6 +172,7 @@ class TeslaPWController(udi_interface.Node):
             '''
             LOGGER.debug('Node installation complete')
             self.nodeDefineDone = True
+            self.initialized = True
             #LOGGER.debug('updateISYdrivers')
             #self.updateISYdrivers('all')
             
