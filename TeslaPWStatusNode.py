@@ -73,7 +73,7 @@ class teslaPWStatusNode(udi_interface.Node):
             {'driver': 'GV2', 'value': 0, 'uom': 25},  #mode
             {'driver': 'GV3', 'value': 0, 'uom': 25},  #grid status
             {'driver': 'GV4', 'value': 0, 'uom': 25},  #on/off line
-            {'driver': 'GV5', 'value': 0, 'uom': 51},  #grid services
+            {'driver': 'GV5', 'value': 0, 'uom': 25},  #grid services
             {'driver': 'GV6', 'value': 0, 'uom': 33},  #battery supply
             {'driver': 'GV7', 'value': 0, 'uom': 33},  #battery today
             {'driver': 'GV8', 'value': 0, 'uom': 33},  #battery yesterday
@@ -83,10 +83,10 @@ class teslaPWStatusNode(udi_interface.Node):
             {'driver': 'GV12', 'value': 0, 'uom': 33}, #load
             {'driver': 'GV13', 'value': 0, 'uom': 33}, #consumption today
             {'driver': 'GV14', 'value': 0, 'uom': 33}, #consumption yesterday
-            {'driver': 'GV15', 'value': 0, 'uom': 51}, #generation today
-            {'driver': 'GV16', 'value': 0, 'uom': 51}, #generation yesterday
-            {'driver': 'GV17', 'value': 0, 'uom': 51}, #grid service today
-            {'driver': 'GV18', 'value': 0, 'uom': 51}, #grid service yesterday
+            {'driver': 'GV15', 'value': 0, 'uom': 33}, #generation today
+            {'driver': 'GV16', 'value': 0, 'uom': 33}, #generation yesterday
+            {'driver': 'GV17', 'value': 0, 'uom': 33}, #grid service today
+            {'driver': 'GV18', 'value': 0, 'uom': 33}, #grid service yesterday
             ]
 
 
