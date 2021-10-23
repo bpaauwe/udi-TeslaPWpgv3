@@ -83,7 +83,12 @@ class TeslaPWController(udi_interface.Node):
     def tesla_initialize(self, local_email, local_password, local_ip, cloud_email, cloud_password, cloud_key):
         LOGGER.debug('starting Login process')
         try:
-            self.TPW = tesla_info(self.name, self.address, self.Parameters['ACCESS'])
+
+            '''
+            This needs a BOTH/CLOUD/LOCAL value to properly know what type, but
+            we now only have localAccess/cloudAccess so lets pass those instead
+            '''
+            self.TPW = tesla_info(self.name, self.address, self.localAccess, self.cloudAccess)
             #self.poly.Notices.clear()
             if self.localAccess:
                 LOGGER.debug('Attempting to log in via local auth')

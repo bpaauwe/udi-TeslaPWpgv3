@@ -17,10 +17,11 @@ from ISYprofile import isyHandling
 
 
 class tesla_info:
-    def __init__ (self,  ISYname, ISY_Id, teslaConnection):
+    def __init__ (self,  ISYname, ISY_Id, local, cloud):
         self.TEST = False
 
         LOGGER.debug('class tesla_info - init')
+        self.TPWcloud = None
         self.localPassword = ''
         self.localEmail = ''
         self.IPAddress = ''
@@ -38,19 +39,10 @@ class tesla_info:
         self.cloudAccessUp = False
         self.isyINFO = isyHandling()
         self.lastDay = date.today()  
+        self.TPWlocalAccess = local
+        self.TPWcloudAccess = cloud
 
-        if teslaConnection == 'BOTH':
-            self.TPWlocalAccess = True
-            self.TPWcloudAccess = True
-        elif teslaConnection == 'LOCAL':
-            self.TPWlocalAccess = True
-            self.TPWcloudAccess = False
-        elif teslaConnection == 'CLOUD':
-            self.TPWlocalAccess = False
-            self.TPWcloudAccess = True
-        else:
-            self.TPWlocalAccess = False
-            self.TPWcloudAccess = False
+        if not local and not cloud:
             LOGGER.debug('No connection specified')
 
 
