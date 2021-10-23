@@ -8,55 +8,34 @@
   <editor id = "CTRL_3" > 
      <range  uom="107" min="0" max="255" prec="0" />
 </editor>
-  <editor id = "PWSTATUS1" > 
+  <editor id = "PERCENT" > 
      <range  uom="51" min="0" max="100" prec="2" />
 </editor>
-  <editor id = "PWSTATUS2" > 
-     <range  uom="25" subset="0-3" nls="PWSTATUS2" />
+  <editor id = "OP_MODE" > 
+     <range  uom="25" subset="0-3" nls="EN_MODE" />
 </editor>
-  <editor id = "PWSTATUS3" > 
-     <range  uom="25" subset="0-3" nls="PWSTATUS3" />
+  <editor id = "GRID_ST" > 
+     <range  uom="25" subset="0-3" nls="EN_GRID_STATUS" />
 </editor>
-  <editor id = "PWSTATUS4" > 
-     <range  uom="25" subset="0-1" nls="PWSTATUS4" />
+  <editor id = "TOU_ST" > 
+     <range  uom="25" subset="0-1" nls="EN_TOU_MODE" />
 </editor>
-  <editor id = "PWSTATUS5" > 
-     <range  uom="25" subset="0-1" nls="PWSTATUS5" />
+  <editor id = "ON_LINE" > 
+     <range  uom="25" subset="0-2" nls="EN_ONLINE" />
 </editor>
-  <editor id = "PWSTATUS6" > 
+  <editor id = "TOGGLE" > 
+     <range  uom="25" subset="0-1" nls="EN_TOGGLE" />
+</editor>
+  <editor id = "KWH_LOW" > 
      <range  uom="33" min="0" max="20" prec="2" />
 </editor>
-  <editor id = "PWSTATUS7" > 
+  <editor id = "KHW" > 
      <range  uom="33" min="-100" max="100" prec="2" />
 </editor>
-  <editor id = "PWSTATUS8" > 
-     <range  uom="33" min="-100" max="100" prec="2" />
-</editor>
-  <editor id = "PWSTATUS9" > 
+  <editor id = "KWH_20" > 
      <range  uom="33" min="-20" max="20" prec="2" />
 </editor>
-  <editor id = "PWSTATUS10" > 
-     <range  uom="33" min="-100" max="-100" prec="2" />
-</editor>
-  <editor id = "PWSTATUS11" > 
-     <range  uom="33" min="-100" max="100" prec="2" />
-</editor>
-  <editor id = "PWSTATUS12" > 
-     <range  uom="33" min="-100" max="100" prec="2" />
-</editor>
-  <editor id = "PWSTATUS13" > 
-     <range  uom="33" min="-100" max="100" prec="2" />
-</editor>
-  <editor id = "PWSTATUS14" > 
-     <range  uom="33" min="-100" max="100" prec="2" />
-</editor>
-  <editor id = "PWSTATUS15" > 
-     <range  uom="33" min="-100" max="100" prec="1" />
-</editor>
-  <editor id = "PWSTATUS16" > 
-     <range  uom="33" min="-100" max="100" prec="2" />
-</editor>
-  <editor id = "PWSTATUS17" > 
-     <range  uom="33" min="-100" max="100" prec="2" />
+  <editor id = "TIME" > 
+     <range  uom="58" min="0" max="86400" prec="0" />
 </editor>
 </editors> 

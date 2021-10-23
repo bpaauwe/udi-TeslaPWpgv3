@@ -24,87 +24,31 @@ class teslaPWSetupNode(udi_interface.Node):
         self.name = name
         self.hb = 0
 
-        self.drivers = []
         self.poly.subscribe(self.poly.START, self.start, address)
-        self.poly.subscribe(self.poly.LOGLEVEL, self.handleLevelChange)
         
-        self.nodeDefineDone = False
-        LOGGER.debug('Start Tesla Power Wall Setup Node')  
-
-        self.ISYparams = self.TPW.supportedParamters(self.id)
-        #LOGGER.debug ('Node = ISYparams :' + str(self.ISYparams))
-
-        self.ISYcriticalParams = self.TPW.criticalParamters(self.id)
-        #LOGGER.debug ('Node = ISYcriticalParams :' + str(self.ISYcriticalParams))
-    
-
-        for key in self.ISYparams:
-            info = self.ISYparams[key]
-
-            if info != {}:
-                value = self.TPW.getISYvalue(key, self.id)
-                LOGGER.debug('SetupNode: driver' + str(key)+ ' value:' + str(value) + ' uom:' + str(info['uom']) )
-                self.drivers.append({'driver':key, 'value':value, 'uom':info['uom'] })
-        LOGGER.debug( 'Setup node init - DONE')
-        LOGGER.debug (self.drivers)
-        self.poly.updateProfile()
-        # NO! self.poly.ready()
-        #self.heartbeat()
-
 
     def start(self):                
+        LOGGER.debug('Start Tesla Power Wall Setup Node')  
         self.updateISYdrivers('all')
-        #self.reportDrivers()
-        self.nodeDefineDone = True
-
 
     def stop(self):
         LOGGER.debug('stop - Cleaning up')
 
-    
-    def handleLevelChange(self, level):
-        LOGGER.info('New log level: {}'.format(level))
-
-    def shortPoll(self):
-        #No need to poll data - done by Controller
-        LOGGER.debug('Tesla Power Wall setupNode shortPoll')
-        if self.nodeDefineDone:
-            self.updateISYdrivers('critical')
-        else:
-           LOGGER.info('Setup Node: waiting for system/nodes to get created')
-
-                
-
-    def longPoll(self):
-        #No need to poll data - done by Controller
-        LOGGER.debug('Tesla Power Wall  sentupNode longPoll')
-        if self.nodeDefineDone:
-           self.updateISYdrivers('all')
-        else:
-           LOGGER.info('Setup Node: waiting for system/nodes to get created')
-
     def updateISYdrivers(self, level):
         LOGGER.debug('Node updateISYdrivers')
-        params = []
+        self.setDriver('GV1', self.TPW.getTPW_backoffLevel())
+        self.setDriver('GV2', self.TPW.getTPW_operationMode())
+        self.setDriver('GV3', self.TPW.getTPW_stormMode())
+        self.setDriver('GV4', self.TPW.getTPW_touMode())
         if level == 'all':
-            params = self.ISYparams
-            if params:
-                for key in params:
-                    info = params[key]
-                    if info != {}:
-                        value = self.TPW.getISYvalue(key, self.id)
-                        LOGGER.debug('SETUP Update ISY drivers :' + str(key)+ ' ' + info['systemVar']+ ' value:' + str(value) )
-                        self.setDriver(key, value)      
-        elif level == 'critical':
-            params = self.ISYcriticalParams
-            if params:
-                for key in params:
-                    value = self.TPW.getISYvalue(key, self.id)
-                    LOGGER.debug('SETUP Update ISY drivers :' + str(key)+ ' value: ' + str(value) )
-                    self.setDriver(key, value)        
-
-        else:
-           LOGGER.debug('Wrong parameter passed: ' + str(level))
+            self.setDriver('GV5', self.TPW.getTPW_getTouData('weekend', 'off_peak', 'start'))
+            self.setDriver('GV6', self.TPW.getTPW_getTouData('weekend', 'off_peak', 'stop'))
+            self.setDriver('GV7', self.TPW.getTPW_getTouData('weekend', 'peak', 'start'))
+            self.setDriver('GV8', self.TPW.getTPW_getTouData('weekend', 'peak', 'stop'))
+            self.setDriver('GV9', self.TPW.getTPW_getTouData('weekday', 'off_peak', 'start'))
+            self.setDriver('GV10', self.TPW.getTPW_getTouData('weekday', 'off_peak', 'stop'))
+            self.setDriver('GV11', self.TPW.getTPW_getTouData('weekday', 'peak', 'start'))
+            self.setDriver('GV12', self.TPW.getTPW_getTouData('weekday', 'peak', 'stop'))
         LOGGER.debug('updateISYdrivers - setupnode DONE')
 
 
@@ -229,7 +173,20 @@ class teslaPWSetupNode(udi_interface.Node):
 
                 }
 
-
+    drivers = [
+            {'driver': 'GV1', 'value': 0, 'uom': 51},  #backup reserve
+            {'driver': 'GV2', 'value': 0, 'uom': 25},  #operating mode
+            {'driver': 'GV3', 'value': 0, 'uom': 25},  #storm mode
+            {'driver': 'GV4', 'value': 0, 'uom': 25},  #time of use mode
+            {'driver': 'GV5', 'value': 0, 'uom': 58},  #weekend off start
+            {'driver': 'GV6', 'value': 0, 'uom': 58},  #weekend off end
+            {'driver': 'GV7', 'value': 0, 'uom': 58},  #weekend on start
+            {'driver': 'GV8', 'value': 0, 'uom': 58},  #weekend on end
+            {'driver': 'GV9', 'value': 0, 'uom': 58},  #weekday off start
+            {'driver': 'GV10', 'value': 0, 'uom': 58}, #weekday off end
+            {'driver': 'GV11', 'value': 0, 'uom': 58}, #weekday on start 
+            {'driver': 'GV12', 'value': 0, 'uom': 58}, #weekday on end 
+            ]
 
         
 

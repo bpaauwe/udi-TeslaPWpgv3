@@ -16,7 +16,6 @@ class teslaPWStatusNode(udi_interface.Node):
 
     def __init__(self, polyglot, primary, address, name, TPW):
         super(teslaPWStatusNode, self).__init__(polyglot, primary, address, name)
-
         LOGGER.info('_init_ Tesla Power Wall Status Node')
         self.ISYforced = False
         self.TPW = TPW
@@ -24,92 +23,37 @@ class teslaPWStatusNode(udi_interface.Node):
         self.name = name
         self.hb = 0
 
-
-        self.drivers = []
-        self.poly.subscribe(self.poly.LOGLEVEL, self.handleLevelChange)
-        self.poly.subscribe(self.poly.START, self.start, address)
-
-        
-        self.nodeDefineDone = False
-        LOGGER.debug('Start Tesla Power Wall Status Node')  
-
-        self.ISYparams = self.TPW.supportedParamters(self.address)
-        #LOGGER.debug ('Node = ISYparams :' + str(self.ISYparams))
-
-        self.ISYcriticalParams = self.TPW.criticalParamters(self.address)
-        #LOGGER.debug ('Node = ISYcriticalParams :' + str(self.ISYcriticalParams))
-    
-
-        for key in self.ISYparams:
-            info = self.ISYparams[key]
-            #LOGGER.debug(key )
-            if info != {}:
-                value = self.TPW.getISYvalue(key, self.address)
-                LOGGER.debug('StatusNode: driver ' + str(key)+ ' value:' + str(value) + ' uom:' + str(info['uom']) )
-                self.drivers.append({'driver':key, 'value':value, 'uom':info['uom'] })
-        LOGGER.debug( 'Status node init - DONE')
-        LOGGER.debug (self.drivers)
-        self.poly.updateProfile()
-        # NO! self.poly.ready()
+        polyglot.subscribe(polyglot.START, self.start, address)
         
     def start(self):                
+        LOGGER.debug('Start Tesla Power Wall Status Node')  
         self.updateISYdrivers('all')
-        #self.reportDrivers()
-        self.nodeDefineDone = True
-
 
     def stop(self):
         LOGGER.debug('stop - Cleaning up')
     
-    
-    def handleLevelChange(self, level):
-        LOGGER.info('New log level: {}'.format(level))
-    
-    def shortPoll(self):
-        #No need to poll data - done by Controller
-        LOGGER.debug('Tesla Power Wall Status Node shortPoll')
-        if self.nodeDefineDone:
-            self.updateISYdrivers('critical')
-        else:
-           LOGGER.info('Status Node: waiting for system/nodes to get created')
-
-            
-    def longPoll(self):
-        #No need to poll data - done by Controller
-        LOGGER.debug('Tesla Power Wall  status Node longPoll')
-        if self.nodeDefineDone:
-           self.updateISYdrivers('all')
-           #self.reportDrivers() 
-        else:
-           LOGGER.info('Status Node: waiting for system/nodes to get created')
-
     def updateISYdrivers(self, level):
         LOGGER.debug('StatusNode updateISYdrivers')
-        params = []
-        if level == 'all':
-            params = self.ISYparams
-            #LOGGER.debug(params)
-            if params:
-                for key in params:
-                    info = params[key]
-                    LOGGER.debug('all Update Driver, key, info '+ str( key) + ' ,' + str( info['systemVar']))
-                    if info != {}:
-                        value = self.TPW.getISYvalue(key, self.address)
-                        LOGGER.debug('STATUS Update all ISY drivers :' + str(key)+  ' value:' + str(value) )
-                        self.setDriver(key, value)      
-        elif level == 'critical':
-            params = self.ISYcriticalParams
-            LOGGER.debug(params)
-            if params:
-                for key in params:
-                    value = self.TPW.getISYvalue(key, self.address)
-                    LOGGER.debug('STATUS Update critical ISY drivers :' + str(key)+ ' value: ' + str(value) )
-                    self.setDriver(key, value)        
+        self.setDriver('GV1', self.TPW.getTPW_chargeLevel())
+        self.setDriver('GV2', self.TPW.getTPW_operationMode())
+        self.setDriver('GV3', self.TPW.getTPW_gridStatus())
+        self.setDriver('GV4', self.TPW.getTPW_onLine())
+        self.setDriver('GV5', self.TPW.getTPW_gridServiceActive())
+        self.setDriver('GV6', self.TPW.getTPW_batterySupply())
+        self.setDriver('GV9', self.TPW.getTPW_gridSupply())
+        self.setDriver('GV12', self.TPW.getTPW_load())
 
-        else:
-           LOGGER.error('Wrong parameter passed: ' + str(level))
-  
-        #LOGGER.debug('updateISYdrivers - Status node DONE')
+        if level == 'all':
+            self.setDriver('GV7', self.TPW.getTPW_daysBattery())
+            self.setDriver('GV8', self.TPW.getTPW_yesterdayBattery())
+            self.setDriver('GV10', self.TPW.getTPW_daysGrid())
+            self.setDriver('GV11', self.TPW.getTPW_yesterdayGrid())
+            self.setDriver('GV13', self.TPW.getTPW_daysConsumption())
+            self.setDriver('GV14', self.TPW.getTPW_yesterdayConsumption())
+            self.setDriver('GV15', self.TPW.getTPW_daysGeneration())
+            self.setDriver('GV16', self.TPW.getTPW_yesterdayGeneration())
+            self.setDriver('GV17', self.TPW.getTPW_daysGridServicesUse())
+            self.setDriver('GV18', self.TPW.getTPW_yesterdayGridServicesUse())
 
 
     def ISYupdate (self, command):
@@ -123,5 +67,25 @@ class teslaPWStatusNode(udi_interface.Node):
                 }
 
 
+    drivers = [
+            {'driver': 'GV1', 'value': 0, 'uom': 51},  #battery level
+            {'driver': 'GV2', 'value': 0, 'uom': 25},  #mode
+            {'driver': 'GV3', 'value': 0, 'uom': 25},  #grid status
+            {'driver': 'GV4', 'value': 0, 'uom': 25},  #on/off line
+            {'driver': 'GV5', 'value': 0, 'uom': 51},  #grid services
+            {'driver': 'GV6', 'value': 0, 'uom': 33},  #battery supply
+            {'driver': 'GV7', 'value': 0, 'uom': 33},  #battery today
+            {'driver': 'GV8', 'value': 0, 'uom': 33},  #battery yesterday
+            {'driver': 'GV9', 'value': 0, 'uom': 33},  #grid supply
+            {'driver': 'GV10', 'value': 0, 'uom': 33}, #grid today
+            {'driver': 'GV11', 'value': 0, 'uom': 33}, #grid yesterday
+            {'driver': 'GV12', 'value': 0, 'uom': 33}, #load
+            {'driver': 'GV13', 'value': 0, 'uom': 33}, #consumption today
+            {'driver': 'GV14', 'value': 0, 'uom': 33}, #consumption yesterday
+            {'driver': 'GV15', 'value': 0, 'uom': 51}, #generation today
+            {'driver': 'GV16', 'value': 0, 'uom': 51}, #generation yesterday
+            {'driver': 'GV17', 'value': 0, 'uom': 51}, #grid service today
+            {'driver': 'GV18', 'value': 0, 'uom': 51}, #grid service yesterday
+            ]
 
 

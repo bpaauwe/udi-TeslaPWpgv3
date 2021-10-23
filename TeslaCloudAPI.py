@@ -53,8 +53,6 @@ class TeslaCloudAPI():
             self.connectionEstablished = True
             self.site_status = self.teslaGetSiteInfo('site_status')
             self.teslaUpdateCloudData('all')
-            
-            self.daysMeterSummary = self.teslaCalculateDaysTotals()
             self.touSchedule = self.teslaExtractTouScheduleList()
         else:
             LOGGER.error('Error getting cloud data')
@@ -76,6 +74,13 @@ class TeslaCloudAPI():
         #self.battery_status = self.teslaGetBatteryInfo('bat_status') - not used any more 
         #self.battery_info = self.teslaGetBatteryInfo('bat_info') - not used anymore 
 
+    '''
+    Query the cloud for the different types of data.  If all
+    data access fails (i.e. returns None), then return
+    false to indicate that.
+
+    Otherwise, return true to indiate that access is good
+    '''
     def teslaUpdateCloudData(self, mode):
         if mode == 'critical':
             temp =self.teslaGetSiteInfo('site_live')
@@ -83,40 +88,49 @@ class TeslaCloudAPI():
                 self.site_live = temp
                 return(True)
         elif mode == 'all':
+            access = False
             temp= self.teslaGetSiteInfo('site_live')
             if temp != None:
                 self.site_live = temp
+                access = True
                 
             temp = self.teslaGetSiteInfo('site_info')
             if temp != None:
                 self.site_info = temp
+                access = True
+                
             
             temp = self.teslaGetSiteInfo('site_history_day')            
             if temp != None:
                 self.site_history = temp
-                return(True)
-            else:
-                return(False)
+                access = True
+                
+            self.teslaCalculateDaysTotals()
+            return(access)
         else:
+            access = False
             temp= self.teslaGetSiteInfo('site_live')
             if temp != None:
                 self.site_live = temp
+                access = True
                 
             temp = self.teslaGetSiteInfo('site_info')
             if temp != None:
                 self.site_info = temp
+                access = True
             
             temp = self.teslaGetSiteInfo('site_history_day')            
             if temp != None:
                 self.site_history = temp
+                access = True
 
             temp = self.teslaGetSiteInfo('site_status')
             if temp != None:
                 self.site_status = temp
-                return(True)
-            else:
-                return(False)
+                access = True
 
+            self.teslaCalculateDaysTotals()
+            return(access)
 
     def supportedOperatingModes(self):
         return( self.OPERATING_MODES )

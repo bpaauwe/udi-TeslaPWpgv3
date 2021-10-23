@@ -10,6 +10,8 @@ import time
 from  TeslaInfo import tesla_info
 from TeslaPWSetupNode import teslaPWSetupNode
 from TeslaPWStatusNode import teslaPWStatusNode
+from TeslaPWSolarNode import teslaPWSolarNode
+from TeslaPWGenNode import teslaPWGenNode
 
 
 LOGGER = udi_interface.LOGGER
@@ -25,6 +27,8 @@ class TeslaPWController(udi_interface.Node):
         self.name = 'Tesla PowerWall Info'
         self.primary = primary
         self.address = address
+        self.cloudAccess = False
+        self.localAccess = False
 
         self.poly.subscribe(self.poly.START, self.start, address)
         self.poly.subscribe(self.poly.LOGLEVEL, self.handleLevelChange)
@@ -49,10 +53,6 @@ class TeslaPWController(udi_interface.Node):
         LOGGER.debug('Controller init DONE')
         self.longPollCountMissed = 0
         
-        self.defaultParams = {  'CLOUD':  { } ,
-                                'LOCAL':  { },
-                            }   
-
         self.poly.ready()
         self.poly.addNode(self)
 
@@ -64,49 +64,17 @@ class TeslaPWController(udi_interface.Node):
         self.Notices['start'] = 'Check Configuration to make sure all relevant parameters are set'
         #self.poly.Notices.clear()
         #self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
-        self.cloudAccess = False
-        self.localAccess = False
+
+        # Poll for current values (and update nodes??)
+        self.TPW.pollSystemData('all')          
+        self.updateISYdrivers('all')
    
-        # Wait for self.Parameters['ACCESS'] to be updated
-        if 'ACCESS' in self.Parameters:
-            if self.Parameters['ACCESS']  == 'LOCAL/CLOUD/BOTH':
-                self.Notices['ACCESS'] = 'access must be set to LOCAL CLOUD or BOTH'
-                LOGGER.debug('ACCESS must be set ')
-                self.stop()
-        else:
-            self.checkParameters()
-           
-        
-        if self.Parameters['ACCESS'] == 'BOTH' or self.Parameters['ACCESS'] == 'CLOUD':
-            # wait for user to set parameters
-            allKeysSet = True
-            for keys in self.defaultParams['CLOUD']:
-                if self.Parameters[keys] ==  self.defaultParams['CLOUD'][keys]:
-                    allKeysSet = False
-                    self.Notices[keys] =  str(keys) + 'not set'
-            if not allKeysSet:
-                 LOGGER.debug('Not all CLOUD parameters are specified' )
-                 self.checkParameters()
-                 self.stop()
-            else:
-                self.cloudAccess = True
-            # All cloud keys defined
 
-        if  self.Parameters['ACCESS'] == 'BOTH' or self.Parameters['ACCESS'] == 'LOCAL':
-            allKeysSet = True
-            for keys in self.defaultParams['LOCAL']:
-                if self.Parameters[keys]==  self.defaultParams['LOCAL'][keys]:
-                    allKeysSet = False
-                    self.Notices[keys] =  str(keys) + 'not set'
-            if not allKeysSet:
-                 LOGGER.debug('Not all LOCAL parameters are specified' )
-                 self.checkParameters()
-                 self.stop()
-            else:
-                self.localAccess = True
-            #all local keys defined
-
-
+    '''
+    This may be called multiple times with different settings as the user
+    could be enabling or disabling the various types of access.  So if the
+    user changes something, we want to re-initialize.
+    '''
     def tesla_initialize(self, local_email, local_password, local_ip, cloud_email, cloud_password, cloud_key):
         LOGGER.debug('starting Login process')
         try:
@@ -121,20 +89,52 @@ class TeslaPWController(udi_interface.Node):
                 self.TPW.teslaCloudConnect()
 
             self.TPW.teslaInitializeData()
-            self.TPW.pollSystemData('all')          
-            self.ISYparams = self.TPW.supportedParamters(self.address)
+
+            # TODO: remove self.ISYparams = self.TPW.supportedParamters(self.address)
             #LOGGER.debug( self.ISYparams)
-            self.ISYcriticalParams = self.TPW.criticalParamters(self.address)
+            # TODO: remove self.ISYcriticalParams = self.TPW.criticalParamters(self.address)
 
             if self.Parameters['LOGFILE'] == 'ENABLED':
                 self.TPW.createLogFile(self.logFile)
             
                      
+            '''
+            node addresses:
+               setup node:            pwsetup 'Control Parameters'
+               main status node:      pwstatus 'Power Wall Status'
+               generator status node: genstatus 'Generator Status'
+               solar status node:     solarstatus 'Solar Status'
+            '''
             LOGGER.info('Creating Nodes')
+            if not self.poly.getNode('pwstatus'):
+                node = teslaPWStatusNode(self.poly, self.address, 'pwstatus', 'Power Wall Status', self.TPW)
+                self.poly.addNode(node)
+
+            if self.TPW.solarInstalled:
+                if not self.poly.getNode('solarstatus'):
+                    node = teslaSolarNode(self.poly, self.address, 'solarstatus', 'Solar Status', self.TPW)
+                    self.poly.addNode(node)
+            else:
+                self.poly.delNode('solarstatus')
+
+            if self.TPW.generatorInstalled:
+                if not self.poly.getNode('genstatus'):
+                    node = teslaGeneratorNode(self.poly, self.address, 'genstatus', 'Generator Status', self.TPW)
+                    self.poly.addNode(node)
+            else:
+                self.poly.delNode('genstatus')
+
+            if self.cloudAccess:
+                if not self.poly.getNode('pwsetup'):
+                    node = teslaPWSetupNode(self.poly, self.address, 'pwsetup', 'Control Parameters', self.TPW)
+                    self.poly.addNode(node)
+            else:
+                self.poly.delNode('pwsetup')
+
 
             # Bob - Why is this called twice?
-            self.ISYparams = self.TPW.supportedParamters(self.address)
-            self.ISYcriticalParams = self.TPW.criticalParamters(self.address)
+            # TODO: remove self.ISYparams = self.TPW.supportedParamters(self.address)
+            # TODO: remove self.ISYcriticalParams = self.TPW.criticalParamters(self.address)
             '''
             LOGGER.debug(self.ISYparams)
             for key in self.ISYparams:
@@ -146,8 +146,8 @@ class TeslaPWController(udi_interface.Node):
             LOGGER.debug('Drivers:')        
             LOGGER.debug(self.drivers)
             '''
-            self.poly.updateProfile()
-            self.poly.Notices.clear()
+            #self.poly.updateProfile()
+            #self.poly.Notices.clear()
 
             '''
             nodeList = self.TPW.getNodeIdList()
@@ -167,8 +167,8 @@ class TeslaPWController(udi_interface.Node):
             '''
             LOGGER.debug('Node installation complete')
             self.nodeDefineDone = True
-            LOGGER.debug('updateISYdrivers')
-            self.updateISYdrivers('all')
+            #LOGGER.debug('updateISYdrivers')
+            #self.updateISYdrivers('all')
             
 
             #self.longPoll() # Update all drivers
@@ -188,9 +188,11 @@ class TeslaPWController(udi_interface.Node):
         self.poly.Notices.clear()
         cloud_valid = False
         local_valid = False
+        self.localAccess = False
+        self.cloudAccess = False
 
         if 'LOGFILE' in userParam:
-            self.logfile = userParam['LOGFILE'].tolower()
+            self.logfile = userParam['LOGFILE'].lower()
 
         if 'LOCAL_USER_EMAIL' in userParam:
             local_email = userParam['LOCAL_USER_EMAIL']
@@ -229,7 +231,6 @@ class TeslaPWController(udi_interface.Node):
             cloud_key = ''
 
         if local_email != '' or local_password != '' or local_ip != '':
-            self.localAccess = True
             local_valid = True
             if local_email == '':
                 self.poly.Notices['lu'] = 'Please enter the local user name'
@@ -243,7 +244,6 @@ class TeslaPWController(udi_interface.Node):
 
 
         if cloud_email != '' or cloud_password != '' or cloud_key != '':
-            self.cloudAccess = True
             cloud_valid = True
             if cloud_email == '':
                 self.poly.Notices['cu'] = 'Please enter the cloud user name'
@@ -257,45 +257,16 @@ class TeslaPWController(udi_interface.Node):
 
         if local_valid:
             LOGGER.debug('Local access is valid, configure....')
+            self.localAccess = True
 
         if cloud_valid:
             LOGGER.debug('Cloud access is valid, configure....')
+            self.cloudAccess = True
+
+        if cloud_valid or local_valid:
+            self.tesla_initialize(local_email, local_password, local_ip, cloud_email, cloud_password, cloud_key)
         
         
-    def checkParameters(self):
-        if self.Parameters['ACCESS'] is None:
-            self.Parameters['ACCESS'] = 'LOCAL/CLOUD/BOTH'
-             
-        if self.Parameters['LOCAL_USER_EMAIL'] is None:
-            self.Parameters['LOCAL_USER_EMAIL'] = 'me@localPowerwall.com'
-            self.defaultParams['LOCAL']['LOCAL_USER_EMAIL'] =  'me@localPowerwall.com'
-
-        if self.Parameters['LOCAL_USER_PASSWORD'] is None:
-            self.Parameters['LOCAL_USER_PASSWORD'] = 'XXXXXXXX'
-            self.defaultParams['LOCAL']['LOCAL_USER_EMAIL'] =  'XXXXXXXX'
-
-        if self.Parameters['IP_ADDRESS'] is None:
-            self.Parameters['IP_ADDRESS'] = '192.168.1.xxx'
-            self.defaultParams['LOCAL']['IP_ADDRESS'] =  '192.168.1.xxx'
-
-        if self.Parameters['CLOUD_USER_EMAIL'] is None:
-            self.Parameters['CLOUD_USER_EMAIL'] = 'me@myTeslaCloudemail.com'
-            self.defaultParams['CLOUD']['CLOUD_USER_EMAIL'] =  'me@myTeslaCloudemail.com'
-
-        if self.Parameters['CLOUD_USER_PASSWORD'] is None:
-            self.Parameters['CLOUD_USER_PASSWORD'] = 'XXXXXXXX'
-            self.defaultParams['CLOUD']['CLOUD_USER_PASSWORD'] =  'XXXXXXXX'
-
-        if self.Parameters['CAPTCHA_APIKEY'] is None:
-            self.Parameters['CAPTCHA_APIKEY'] = 'api key to enable AUTO captcha solver'
-            self.defaultParams['CLOUD']['CAPTCHA_APIKEY'] =  'api key to enable AUTO captcha solver'
-
-        if self.Parameters['LOGFILE'] is None:
-            self.Parameters['LOGFILE'] = 'DISABLED'
-       
-    #def handleNotifications(self):
-        
-
     def stop(self):
         #self.removeNoticesAll()
         if self.TPW:
@@ -411,6 +382,7 @@ if __name__ == "__main__":
         #LOGGER.info('Starting Tesla Power Wall Controller')
         polyglot = udi_interface.Interface([])
         polyglot.start()
+        polyglot.setCustomParamsDoc()
         TeslaPWController(polyglot, 'controller', 'controller', 'TeslaPowerWall')
         polyglot.runForever()
     except (KeyboardInterrupt, SystemExit):
