@@ -365,17 +365,17 @@ class TeslaPWController(udi_interface.Node):
     def updateISYdrivers(self, level):
         LOGGER.debug('System updateISYdrivers - ' + str(level))       
         if level == 'all':
-            value = self.TPW.getISYvalue('GV2', self.address)
+            value = self.TPW.isNodeServerUp()
             if value == 0:
                self.longPollCountMissed = self.longPollCountMissed + 1
             else:
                self.longPollCountMissed = 0
-            self.setDriver('GV2', value )
+            self.setDriver('GV2', value)
             self.setDriver('GV3', self.longPollCountMissed)     
             LOGGER.debug('CTRL Update ISY drivers : GV2  value:' + str(value) )
             LOGGER.debug('CTRL Update ISY drivers : GV3  value:' + str(self.longPollCountMissed) )
         elif level == 'critical':
-            value = self.TPW.getISYvalue('GV2', self.address)
+            value = self.TPW.isNodeServerUp()
             self.setDriver('GV2', value)   
             LOGGER.debug('CTRL Update ISY drivers : GV2  value:' + str(value) )
         else:
