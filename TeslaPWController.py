@@ -127,14 +127,14 @@ class TeslaPWController(udi_interface.Node):
 
             if self.TPW.solarInstalled:
                 if not self.poly.getNode('solarstatus'):
-                    node = teslaSolarNode(self.poly, self.address, 'solarstatus', 'Solar Status', self.TPW)
+                    node = teslaPWSolarNode(self.poly, self.address, 'solarstatus', 'Solar Status', self.TPW)
                     self.poly.addNode(node)
             else:
                 self.poly.delNode('solarstatus')
 
             if self.TPW.generatorInstalled:
                 if not self.poly.getNode('genstatus'):
-                    node = teslaGenNode(self.poly, self.address, 'genstatus', 'Generator Status', self.TPW)
+                    node = teslaPWGenNode(self.poly, self.address, 'genstatus', 'Generator Status', self.TPW)
                     self.poly.addNode(node)
             else:
                 self.poly.delNode('genstatus')
