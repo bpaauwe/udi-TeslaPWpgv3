@@ -57,97 +57,73 @@ class teslaPWSetupNode(udi_interface.Node):
         LOGGER.debug('setStormMode')
         value = int(command.get('value'))
         self.TPW.setTPW_stormMode(value)
-        ISYvar = self.TPW.getStormModeISYVar(self.id)
-        self.setDriver(ISYvar, value)
-        #self.reportDrivers() 
+        self.setDriver('GV3', value)
         
     def setOperatingMode(self, command):
         LOGGER.debug('setOperatingMode')
         value = int(command.get('value'))
         self.TPW.setTPW_operationMode(value)
-        ISYvar = self.TPW.getOperatingModeISYVar(self.id)
-        self.setDriver(ISYvar, value)
-        #self.reportDrivers() 
+        self.setDriver('GV2', value)
     
     def setBackupPercent(self, command):
         LOGGER.debug('setBackupPercent')
         value = float(command.get('value'))
         self.TPW.setTPW_backoffLevel(value)
-        ISYvar = self.TPW.getBackupPercentISYVar(self.id)
-        self.setDriver(ISYvar, value)
-        #self.reportDrivers() 
+        self.setDriver('GV1', value)
 
     def setTOUmode(self, command):
         LOGGER.debug('setTOUmode')
         value = int(command.get('value'))
         self.TPW.setTPW_touMode(value)
-        ISYvar = self.TPW.getTOUmodeISYVar(self.id)
-        self.setDriver(ISYvar, value)
-        #self.reportDrivers() 
+        self.setDriver('GV4', value)
 
     def setWeekendOffpeakStart(self, command):
         LOGGER.debug('setWeekendOffpeakStart')
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('off_peak', 'weekend', 'start', value)
-        ISYvar = self.TPW.getTouWeekendOffpeakStartISYVar(self.id)
-        self.setDriver(ISYvar, value)
-        #self.reportDrivers() 
+        self.setDriver('GV5', value)
 
     def setWeekendOffpeakEnd(self, command):
         LOGGER.debug('setWeekendOffpeakEnd')
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('off_peak', 'weekend', 'end', value)
-        ISYvar = self.TPW.getTouWeekendOffpeakEndISYVar(self.id)
-        self.setDriver(ISYvar, value)
-        #self.reportDrivers() 
+        self.setDriver('GV6', value)
 
     def setWeekendPeakStart(self, command):
         LOGGER.debug('setWeekendPeakStart')
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('peak', 'weekend', 'start', value)
-        ISYvar = self.TPW.getTouWeekendPeakStartISYVar(self.id)
-        self.setDriver(ISYvar, value)
-        #self.reportDrivers()       
+        self.setDriver('GV7', value)
 
     def setWeekendPeakEnd(self, command):
         LOGGER.debug('setWeekendPeakEnd')
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('peak', 'weekend', 'end', value)
-        ISYvar = self.TPW.getTouWeekendPeakEndISYVar(self.id)
-        self.setDriver(ISYvar, value)
-        #self.reportDrivers()    
+        self.setDriver('GV8', value)
 
     def setWeekOffpeakStart(self, command):
         LOGGER.debug('setWeekOffpeakStart')
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('off_peak', 'week', 'start', value)
-        ISYvar = self.TPW.getTouWeekOffpeakStartISYVar(self.id)
-        self.setDriver(ISYvar, value)
-        #self.reportDrivers() 
+        self.setDriver('GV9', value)
 
     def setWeekOffpeakEnd(self, command):
         LOGGER.debug('setWeekOffpeakEnd')
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('off_peak', 'week', 'end', value)
-        ISYvar = self.TPW.getTouWeekOffpeakEndISYVar(self.id)
-        self.setDriver(ISYvar, value)
-        #self.reportDrivers() 
+        self.setDriver('GV10', value)
 
     def setWeekPeakStart(self, command):
         LOGGER.debug('setWeekPeakStart')
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('peak', 'week', 'start', value)
-        ISYvar = self.TPW.getTouWeekPeakStartISYVar(self.id)
-        self.setDriver(ISYvar, value)
-        #self.reportDrivers()   
+        self.setDriver('GV11', value)
 
     def setWeekPeakEnd(self, command):
         LOGGER.debug('setWeekPeakEnd')
         value = int(command.get('value'))
         self.TPW.setTPW_updateTouSchedule('peak', 'week', 'end', value)
-        ISYvar = self.TPW.getTouWeekPeakEndISYVar(self.id)
-        self.setDriver(ISYvar, value)
-        #self.reportDrivers() 
+        self.setDriver('GV12', value)
 
 
     def ISYupdate (self, command):
