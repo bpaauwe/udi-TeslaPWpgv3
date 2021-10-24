@@ -39,20 +39,15 @@ class TeslaPWController(udi_interface.Node):
         self.Parameters = Custom(polyglot, 'customparams')
         self.Notices = Custom(polyglot, 'notices')
        
-        #self.poly.ready()
-        #self.poly.addNode(self)
- 
         LOGGER.debug('self.address : ' + str(self.address))
         LOGGER.debug('self.name :' + str(self.name))
         self.hb = 0
         #if not(PG_CLOUD_ONLY):
         
-        #self.drivers = []
-        #LOGGER.debug('MAIN ADDING DRIVER' + str(self.drivers))
         self.nodeDefineDone = False
+        self.longPollCountMissed = 0
 
         LOGGER.debug('Controller init DONE')
-        self.longPollCountMissed = 0
         
         self.poly.ready()
         self.poly.addNode(self)
@@ -61,16 +56,12 @@ class TeslaPWController(udi_interface.Node):
     def start(self):
        
         LOGGER.debug('start')
-        #self.poly.setCustomParamsDoc()
-        #self.Notices['start'] = 'Check Configuration to make sure all relevant parameters are set'
-        #self.poly.Notices.clear()
-        #self.poly.Notices['start'] = 'Check CONFIG to make sure all relevant paraeters are set'
 
         # Wait for things to initialize....
         while not self.initialized:
             time.sleep(1)
 
-        # Poll for current values (and update nodes??)
+        # Poll for current values (and update drivers)
         self.TPW.pollSystemData('all')          
         self.updateISYdrivers('all')
    
@@ -84,12 +75,7 @@ class TeslaPWController(udi_interface.Node):
         LOGGER.debug('starting Login process')
         try:
 
-            '''
-            This needs a BOTH/CLOUD/LOCAL value to properly know what type, but
-            we now only have localAccess/cloudAccess so lets pass those instead
-            '''
             self.TPW = tesla_info(self.name, self.address, self.localAccess, self.cloudAccess)
-            #self.poly.Notices.clear()
             if self.localAccess:
                 LOGGER.debug('Attempting to log in via local auth')
                 try:
@@ -97,21 +83,15 @@ class TeslaPWController(udi_interface.Node):
                 except:
                     LOGGER.error('local authenticated failed.')
                     self.localAccess = False
-                #self.Parameters['LOCAL_USER_EMAIL'], self.Parameters['LOCAL_USER_PASSWORD'], self.Parameters['IP_ADDRESS'])
+
             if self.cloudAccess:
                 self.TPW.loginCloud(cloud_email, cloud_password, cloud_key)
-                #self.Parameters['CLOUD_USER_EMAIL'], self.Parameters['CLOUD_USER_PASSWORD'], self.Parameters['CAPTCHA_APIKEY'])
                 self.TPW.teslaCloudConnect()
 
             self.TPW.teslaInitializeData()
 
-            # TODO: remove self.ISYparams = self.TPW.supportedParamters(self.address)
-            #LOGGER.debug( self.ISYparams)
-            # TODO: remove self.ISYcriticalParams = self.TPW.criticalParamters(self.address)
-
             if self.Parameters['LOGFILE'] == 'ENABLED':
                 self.TPW.createLogFile(self.logFile)
-            
                      
             '''
             node addresses:
@@ -146,48 +126,9 @@ class TeslaPWController(udi_interface.Node):
             else:
                 self.poly.delNode('pwsetup')
 
-
-            # Bob - Why is this called twice?
-            # TODO: remove self.ISYparams = self.TPW.supportedParamters(self.address)
-            # TODO: remove self.ISYcriticalParams = self.TPW.criticalParamters(self.address)
-            '''
-            LOGGER.debug(self.ISYparams)
-            for key in self.ISYparams:
-                info = self.ISYparams[key]
-                if info != {}:
-                    value = self.TPW.getISYvalue(key, self.address)
-                    LOGGER.debug('Controller driver' + str(key)+ ' value:' + str(value) + ' uom:' + str(info['uom']) )
-                    self.drivers.append({'driver':key, 'value':value, 'uom':info['uom'] })
-            LOGGER.debug('Drivers:')        
-            LOGGER.debug(self.drivers)
-            '''
-            #self.poly.updateProfile()
-            #self.poly.Notices.clear()
-
-            '''
-            nodeList = self.TPW.getNodeIdList()
-            for node in nodeList:
-                name = self.TPW.getNodeName(node)
-                LOGGER.debug('Adding Node(node, name, address) ' + str(node) + ' , '+ str(name) + ' , '+str(self.address))
-                if node == self.TPW.getSetupNodeID():  
-                    setupNode = teslaPWSetupNode((self.poly, self.address, node, name, self.TPW))
-                    self.poly.addNode(setupNode)
-                    #self.poly.addNode(teslaPWSetupNode(self.poly, self.address, node, name, self.TPW))
-                    #self.addNode(teslaPWSetupNode(self,self.address, node, name))
-                if node == self.TPW.getStatusNodeID():    
-                    ##self.addNode(teslaPWStatusNode(self,self.address, node, name))
-                    ctrlNode = teslaPWStatusNode(self.poly, self.address, node, name, self.TPW)
-                    self.poly.addNode(ctrlNode)
-                    #self.poly.addNode(teslaPWStatusNode(self.poly, self.address, node, name, self.TPW))
-            '''
             LOGGER.debug('Node installation complete')
             self.nodeDefineDone = True
             self.initialized = True
-            #LOGGER.debug('updateISYdrivers')
-            #self.updateISYdrivers('all')
-            
-
-            #self.longPoll() # Update all drivers
 
         except Exception as e:
             LOGGER.error('Exception Controller start: '+ str(e))
@@ -322,15 +263,6 @@ class TeslaPWController(udi_interface.Node):
             if self.TPW.pollSystemData('critical'):
                 for node in self.poly.nodes():
                     node.updateISYdrivers('critical')
-                '''
-                self.updateISYdrivers('critical')
-                #self.reportDrivers()
-                self.nodes = self.poly.getNodes()
-                for node in self.nodes:
-                    LOGGER.debug('Node : ' + node)
-                    if node != self.address:
-                        self.nodes[node].shortPoll()
-                '''
             else:
                 LOGGER.info('Problem polling data from Tesla system') 
         else:
@@ -346,22 +278,11 @@ class TeslaPWController(udi_interface.Node):
             if self.TPW.pollSystemData('all'):
                 for node in self.poly.nodes():
                     node.updateISYdrivers('all')
-                """
-                self.updateISYdrivers('all')
-                #self.reportDrivers() 
-                
-                self.nodes = self.poly.getNodes()
-                for node in self.nodes:
-                    LOGGER.debug('Node : ' + node)
-                    if node != self.address:
-                        self.nodes[node].longPoll()
-                """
             else:
                 LOGGER.error ('Problem polling data from Tesla system')
         else:
             LOGGER.info('Waiting for system/nodes to get created')
         
-    #Need to update to use variables 
     def updateISYdrivers(self, level):
         LOGGER.debug('System updateISYdrivers - ' + str(level))       
         if level == 'all':
@@ -400,13 +321,6 @@ class TeslaPWController(udi_interface.Node):
             {'driver': 'GV2', 'value':0, 'uom':25},
             {'driver': 'GV3', 'value':0, 'uom':71}
             ]
-    '''
-    drivers= [{'driver': 'ST', 'value':0, 'uom':2},
-              {'driver': 'GV3', 'value':0, 'uom':25},
-
-              
-              {'driver': 'GV2', 'value':0, 'uom':25}]
-    '''
 
 if __name__ == "__main__":
     try:
