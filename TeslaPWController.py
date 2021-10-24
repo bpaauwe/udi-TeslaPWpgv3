@@ -88,6 +88,11 @@ class TeslaPWController(udi_interface.Node):
                 self.TPW.loginCloud(cloud_email, cloud_password, cloud_key)
                 self.TPW.teslaCloudConnect()
 
+            if not self.localAccess and not self.cloudAccess:
+                LOGGER.error('Configuration invalid, initialization aborted.')
+                self.poly.Notices['err'] = 'Configuration is not valid, please update configuration.'
+                return
+
             self.TPW.teslaInitializeData()
 
             if self.Parameters['LOGFILE'] == 'ENABLED':
