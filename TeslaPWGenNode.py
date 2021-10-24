@@ -8,7 +8,6 @@ import udi_interface
 #from os import truncate
 import sys
 import TeslaInfo
-import ISYprofile
 
 LOGGER = udi_interface.LOGGER
                

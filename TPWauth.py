@@ -1,4 +1,3 @@
-#from ISYprofile import PG_CLOUD_ONLY
 import time
 import json
 import hashlib
