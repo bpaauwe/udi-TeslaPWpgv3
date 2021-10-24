@@ -13,7 +13,6 @@ from datetime import date
 import time
 from tesla_powerwall import Powerwall, GridStatus, OperationMode
 from TeslaCloudAPI import TeslaCloudAPI
-from ISYprofile import isyHandling
 
 
 class tesla_info:
@@ -37,7 +36,6 @@ class tesla_info:
         self.ISYCritical = {}
         self.localAccessUp = False
         self.cloudAccessUp = False
-        self.isyINFO = isyHandling()
         self.lastDay = date.today()  
         self.TPWlocalAccess = local
         self.TPWcloudAccess = cloud
@@ -161,172 +159,6 @@ class tesla_info:
         else:
             ModeList=None
         
-        #TODO: remove -- self.createISYsetup()
-        #TODO: remove -- self.pollSystemData('all')
-
-
-    
-
-    # TODO: remove
-    def createISYsetup (self):
-        self.setupNodeID = 'pwsetup' 
-        self.statusName = 'STATUS'
-        self.nodeServerUp = 'nodeServerUp'
-        self.pollSkip = 'pollSkip'
-        self.setupNodeName = 'Control Parameters'
-
-        self.statusNodeID = 'pwstatus'
-        self.statusNodeName = 'Power Wall Status'
-
-        self.nodeIDlist = [self.statusNodeID, self.setupNodeID]
-        self.chargeLevel = 'chargeLevel'
-        self.backoffLevel = 'backoffLevel'
-        self.gridStatus = 'gridStatus'
-        self.solarSupply = 'solarSupply'
-        self.batterySupply = 'batterySupply'     
-        self.gridSupply = 'gridSupply'    
-        self.load = 'load'   
-        self.daysSolar = 'daysSolar'
-        self.daysConsumption = 'daysConsumption'
-        self.daysGeneration = 'daysGeneration'
-        self.daysBattery = 'daysBattery'
-        self.daysGridServices = 'daysGridServices'
-        self.daysGenerator = 'daysGenerator'
-        self.operationMode = 'operationMode' 
-
-        self.ConnectedTesla = 'connectedTesla'
-
-        self.running = 'running'
-        self.powerSupplyMode = 'powerSupplyMode'
-        self.gridServiceActive = 'gridServiceActive'
-
-        self.stormMode = 'stormMode'
-        self.touMode = 'touMode'
-        #self.backupPercent = 'backup_percent'
-        self.weekendOffPeakStartSec = 'weekendOffPeakStart'
-        self.weekendOffPeakEndSec = 'weekendOffPeakStop'
-        self.weekendPeakStartSec = 'weekendPeakStart'
-        self.weekendPeakEndSec = 'weekendPeakStop'
-        self.weekdayOffPeakStartSec = 'weekdayOffPeakStart'
-        self.weekdayOffPeakEndSec = 'weekdayOffPeakStop'
-        self.weekdayPeakStartSec = 'weekdayPeakStart'
-        self.weekdayPeakEndSec = 'weekdayPeakStop'
-
-        self.yesterdaySolar = 'yesterdaysSolar'
-        self.yesterdayConsumption = 'yesterdayConsumption'
-        self.yesterdayGeneration = 'yesterdayGeneration'
-        self.yesterdayBattery = 'yesterdayBattery'
-        self.yesterdayGridServices = 'yesterdayGridServices'
-        self.yesterdayGenerator = 'yesterGenerator'
-
-        # ## CONTROLLER Node ##
-        self.isyINFO.addISYcontroller(self.controllerID, self.controllerName,'Electricity' )
-        self.isyINFO.addISYstatus(self.controllerID, self.statusName)
-        self.isyINFO.addISYcommandSend(self.controllerID, 'DON')
-        self.isyINFO.addISYcommandSend(self.controllerID, 'DOF')
-        self.isyINFO.addIsyVaraiable (self.controllerID, self.nodeServerUp, 'list', None,None, '0-1',None, None, 'Connected to Tesla Power Wall', { 0:'False', 1: 'True' } )
-        self.isyINFO.addIsyVaraiable (self.controllerID, self.pollSkip , 'usernumber', 0 , 255, None, None, 0, 'Missed LongPolls',  None) 
-        self.addISYCriticalParam(self.controllerID, self.nodeServerUp)
-
-        self.isyINFO.addISYcommandReceive(self.controllerID, 'UPDATE', 'Update System Data', None)
-        #self.isyINFO.addControllerDefStruct(self.controllerID, self.controllerName )
-
-        # ## Status Node ##
-        self.isyINFO.addISYnode(self.statusNodeID, self.statusNodeName, 'Electricity')
-        self.isyINFO.addISYcommandReceive(self.statusNodeID, 'UPDATE', 'Update System Data', None)
-
-        self.isyINFO.addIsyVaraiable(self.statusNodeID, self.chargeLevel, 'percent', 0, 100, None, None, 2, 'Battery Charge Level', None )
-        self.isyINFO.addIsyVaraiable (self.statusNodeID, self.operationMode, 'list', None, None, '0-3', None, None, 'Operation Mode', self.operationModeEnum )  
-        self.isyINFO.addIsyVaraiable (self.statusNodeID, self.gridStatus, 'list', None, None, '0-3', None, None, 'Grid Status', self.ISYgridEnum ) 
-
-        if self.TPWlocalAccess:
-            self.isyINFO.addIsyVaraiable (self.statusNodeID, self.ConnectedTesla, 'list', None,None, '0-1',None, None, 'Connected to Tesla', { 0:'False', 1: 'True' }) 
-        self.isyINFO.addIsyVaraiable (self.statusNodeID, self.gridServiceActive, 'list', None,None, '0-1',None, None, 'Grid Services Active', { 0:'False', 1: 'True' }) 
-
-        if self.solarInstalled or PG_CLOUD_ONLY: # only add if solar exist - cannot test if this works as intented, and I cannot remove solar (I have solar)
-            self.isyINFO.addIsyVaraiable (self.statusNodeID, self.solarSupply, 'KWh', 0, 20, None, None, 2, 'Current Solar Supply', None ) 
-            self.isyINFO.addIsyVaraiable (self.statusNodeID, self.daysSolar, 'KWh', - 100, 100, None, None, 2, 'Solar Power Today', None ) 
-            self.isyINFO.addIsyVaraiable (self.statusNodeID,self.yesterdaySolar,  'KWh', -100, 100, None, None, 2, 'Solar Power Yesterday', None )
-
-        self.isyINFO.addIsyVaraiable (self.statusNodeID, self.batterySupply, 'KWh', -20, 20, None, None, 2, 'Current Battery Supply', None ) 
-        self.isyINFO.addIsyVaraiable (self.statusNodeID, self.daysBattery, 'KWh', -100, -100, None, None, 2, 'Battery Power Today', None ) 
-        self.isyINFO.addIsyVaraiable (self.statusNodeID, self.yesterdayBattery, 'KWh', -100, 100, None, None, 2, 'Battery Power Yesterday', None ) 
-
-        self.isyINFO.addIsyVaraiable (self.statusNodeID, self.gridSupply, 'KWh', -100, 100, None, None, 2, 'Current Grid Supply', None ) 
-        self.isyINFO.addIsyVaraiable (self.statusNodeID, self.daysConsumption, 'KWh', -100, 100, None, None, 2, 'Power Consumed Today', None ) 
-        self.isyINFO.addIsyVaraiable (self.statusNodeID, self.yesterdayConsumption, 'KWh', -100, 100, None, None, 2, 'Power Consumed Yesterday', None ) 
-
-        self.isyINFO.addIsyVaraiable (self.statusNodeID, self.load, 'KWh', -100, 100, None, None, 1, 'Current Load', None ) 
-        self.isyINFO.addIsyVaraiable (self.statusNodeID, self.daysGeneration, 'KWh', -100, 100, None, None, 2, 'Total Power Today', None ) 
-        self.isyINFO.addIsyVaraiable (self.statusNodeID, self.yesterdayGeneration, 'KWh', -100, 100, None, None, 2, 'Total Power Yesterday', None ) 
-
-        if self.TPWcloudAccess:
-            self.isyINFO.addIsyVaraiable (self.statusNodeID, self.daysGridServices, 'KWh', -100, 100, None, None, 2, 'Grid Service Power Today', None ) 
-            self.isyINFO.addIsyVaraiable (self.statusNodeID, self.yesterdayGridServices, 'KWh', -100, 100, None, None, 2, 'Grid Service Power Yesterday', None )   
-            
-        if self.generatorInstalled and (self.TPWcloudAccess and not(self.TPWlocalAccess)) or (PG_CLOUD_ONLY): #I have no generator so I cannot test this if it 
-            self.isyINFO.addIsyVaraiable (self.statusNodeID, self.daysGenerator, 'KWh', -100, 100, None, None, 2, 'Generator Power Today', None ) 
-            self.isyINFO.addIsyVaraiable (self.statusNodeID, self.yesterdayGenerator, 'KWh', -100, 100, None, None, 2, 'Generator Power Yesterday', None ) 
-        
-        self.addISYCriticalParam(self.statusNodeID, self.operationMode)
-
-
-        # ## Setup Node ##
-        if self.TPWcloudAccess:
-            self.isyINFO.addISYnode(self.setupNodeID, self.setupNodeName, 'Electricity')
-
-            self.isyINFO.addISYcommandReceive(self.setupNodeID, 'BACKUP_PCT', 'Backup Reserve (%)', self.backoffLevel)
-            self.isyINFO.addIsyVaraiable( self.setupNodeID, self.backoffLevel, 'percent', 0, 100, None, None, 1, 'Backup Reserve (%)', None ) 
-
-            self.isyINFO.addISYcommandReceive(self.setupNodeID, 'OP_MODE', 'Operating Mode', self.operationMode)
-            self.isyINFO.addIsyVaraiable (self.setupNodeID, self.operationMode, 'list', None, None, '0-'+ str(len(self.operationModeEnum)-1), None, None, 'Operating Mode', self.operationModeEnum  ) 
-
-            self.isyINFO.addISYcommandReceive(self.setupNodeID, 'STORM_MODE', 'Set Storm Mode', self.stormMode)
-            self.isyINFO.addIsyVaraiable( self.setupNodeID, self.stormMode,'list', None,None, '0-1',None, None, 'Storm Mode', { 0:'Disabled', 1: 'Enabled' }) 
-
-            self.isyINFO.addISYcommandReceive(self.setupNodeID, 'TOU_MODE', 'Time of Use Mode', self.touMode)
-            self.isyINFO.addIsyVaraiable (self.setupNodeID, self.touMode,  'list', None, None, '0-'+ str(len(self.touCloudEnum)-1), None, None, 'Time of Use Mode', self.touCloudEnum  ) 
-        
-            self.isyINFO.addIsyVaraiable(self.setupNodeID, self.weekendOffPeakStartSec, 'durationSec', 0, 86400, None, None, 0, 'Weekend Off-peak Start time (sec)', None )
-            self.isyINFO.addISYcommandReceive(self.setupNodeID, 'WE_O_PEAK_START', 'Weekend Off-peak Start Time (sec)', self.weekendOffPeakStartSec)
-
-            self.isyINFO.addIsyVaraiable(self.setupNodeID, self.weekendOffPeakEndSec, 'durationSec', 0, 86400, None, None, 0, 'Weekend Off-peak End time (sec)', None )
-            self.isyINFO.addISYcommandReceive(self.setupNodeID, 'WE_O_PEAK_END', 'Weekend Off-peak Stop Time (sec)', self.weekendOffPeakEndSec)
-
-            self.isyINFO.addIsyVaraiable(self.setupNodeID, self.weekendPeakStartSec, 'durationSec', 0, 86400, None, None, 0, 'Weekend Peak Start Time (sec)', None )
-            self.isyINFO.addISYcommandReceive(self.setupNodeID, 'WE_PEAK_START', 'Weekend Peak Start Time (sec)', self.weekendPeakStartSec)
-
-            self.isyINFO.addIsyVaraiable( self.setupNodeID, self.weekendPeakEndSec, 'durationSec', 0, 86400, None, None, 0, 'Weekend Peak End Time (sec)', None )
-            self.isyINFO.addISYcommandReceive(self.setupNodeID, 'WE_PEAK_END', 'Weekend Peak Stop Time (sec)', self.weekendPeakEndSec)
-
-            self.isyINFO.addIsyVaraiable(self.setupNodeID, self.weekdayOffPeakStartSec, 'durationSec', 0, 86400, None, None, 0, 'Weekday Off-Peak Start Time (sec)', None )
-            self.isyINFO.addISYcommandReceive(self.setupNodeID, 'WK_O_PEAK_START', 'Weekday Off-peak Start Time (sec)', self.weekdayOffPeakStartSec)
-
-            self.isyINFO.addIsyVaraiable(self.setupNodeID, self.weekdayOffPeakEndSec, 'durationSec', 0, 86400, None, None, 0, 'Weekday Off-peak End time (sec)', None )
-            self.isyINFO.addISYcommandReceive(self.setupNodeID, 'WK_O_PEAK_END', 'Weekday Off-peak Stop Time (sec)', self.weekdayOffPeakEndSec)
-
-            self.isyINFO.addIsyVaraiable(self.setupNodeID, self.weekdayPeakStartSec, 'durationSec', 0, 86400, None, None, 0, 'Weekday Peak Start Time (sec)', None )
-            self.isyINFO.addISYcommandReceive(self.setupNodeID, 'WK_PEAK_START', 'Weekday Peak Start Time (sec)', self.weekdayPeakStartSec)
-
-            self.isyINFO.addIsyVaraiable(self.setupNodeID, self.weekdayPeakEndSec, 'durationSec', 0, 86400, None, None, 0, 'Weekday Peak End Time (sec)', None )
-            self.isyINFO.addISYcommandReceive(self.setupNodeID, 'WK_PEAK_END', 'Weekday Peak Stop Time (sec)', self.weekdayPeakEndSec)
-    
-            self.isyINFO.addISYcommandReceive(self.setupNodeID, 'UPDATE', 'Update System Data', None)
-
-        #self.isyINFO.addNodeDefStruct(self.setupNodeID, self.setupNodeName)
-        
-        self.isyINFO.addControllerDefStruct(self.controllerID, self.controllerName )
-        self.isyINFO.addNodeDefStruct(self.statusNodeID, self.statusNodeName )
-        self.isyINFO.addNodeDefStruct(self.setupNodeID, self.setupNodeName)
-        self.isyINFO.createSetupFiles('nodedefs.xml', 'editors.xml', 'en_us.txt')
-        self.ISYmap = self.isyINFO.createISYmapping()
-
-
-    # TODO: remove
-    def createISYsetupfiles(self, nodeDefFile, editorFile, nlsFile):
-            self.isyINFO.createSetupFiles(nodeDefFile, editorFile, nlsFile)
-            self.ISYmap = self.isyINFO.createISYmapping()
-
     def createLogFile(self, enabled):
         self.logFileEnabled = enabled
 
@@ -345,60 +177,6 @@ class tesla_info:
             LOGGER.error('Exception storeDaysData: '+  str(e))         
             LOGGER.error ('Failed to add data to '+str(filename))
         
-
-    # TODO: remove below methods
-    def getISYSendCommands(self, nodeId):
-        LOGGER.debug('getISYSendCommands :' + str(nodeId))
-        self.isyINFO.getISYSendCommands(nodeId)
-    
-    def getISYReceiveCommands(self, nodeId,):
-        LOGGER.debug('getISYReceiveCommands :' + str(nodeId))
-        self.isyINFO.getISYReceiveCommands(nodeId)
-
-    def supportedParamters (self, nodeId):
-        if nodeId in self.ISYmap:
-            temp = self.ISYmap[nodeId]
-        else:
-            LOGGER.error('Unknown Node Id: ' + str(nodeId))
-            temp = None
-        return(temp)
-
-    def getNodeIdList(self):
-        return(self.isyINFO.getISYnodeList())
-
-    def getNodeName(self, nodeID):
-        return(self.isyINFO.getISYNodeName(nodeID))
-
-    def getStatusNodeID(self):
-        return(self.statusNodeID)
-
-    def getSetupNodeID(self):
-        return(self.setupNodeID)
-
-    def addISYCriticalParam(self, Id, value):
-        if Id in self.ISYCritical:
-            self.ISYCritical[Id].append(value)
-        else:
-            self.ISYCritical[Id] = []
-            self.ISYCritical[Id].append(value)
-
-
-    def criticalParamters (self, nodeId):
-        temp = []
-        if nodeId in self.ISYCritical:
-            if self.ISYCritical[nodeId]:
-                for key in self.ISYCritical[nodeId]:
-                    temp.append(self.isyINFO.varToISY(nodeId, key))
-            else:
-                LOGGER.debug('No critical Params fpr  Node Id: ' + str(nodeId))
-        else:
-            LOGGER.debug('No critical Params fpr  Node Id: ' + str(nodeId))
-        return(temp)
-        #return(self.ISYCritical[nodeId])
-    
-
-    #######  TODO: remove above methods
-
 
     '''
     Get the most current data. We get data from the cloud first, if cloud
@@ -480,91 +258,6 @@ class tesla_info:
             # Need to retrieve/renew token from cloud
 
         
-    # TODO: remove maybe
-    def getISYvalue(self, ISYvar, node):
-        #LOGGER.debug( 'getISYvalue - ' + str(node))
-        if ISYvar in self.ISYmap[node]:
-            self.teslaVarName = self.ISYmap[node][ISYvar]['systemVar']
-            #LOGGER.debug('tesla Var Name: ' + str(self.teslaVarName))
-            if self.teslaVarName == self.chargeLevel: 
-                return(self.getTPW_chargeLevel())
-            elif self.teslaVarName == self.backoffLevel: 
-                return(self.getTPW_backoffLevel())
-            elif self.teslaVarName == self.gridStatus: 
-                return(self.getTPW_gridStatus())
-            elif self.teslaVarName == self.solarSupply:
-                return(self.getTPW_solarSupply())
-            elif self.teslaVarName == self.batterySupply:
-                return(self.getTPW_batterySupply())
-            elif self.teslaVarName == self.gridSupply:
-                return(self.getTPW_gridSupply())
-            elif self.teslaVarName == self.load:
-                return(self.getTPW_load())
-            elif self.teslaVarName == self.daysSolar:
-                return(self.getTPW_daysSolar())
-            elif self.teslaVarName == self.daysConsumption:
-                return(self.getTPW_daysConsumption())
-            elif self.teslaVarName == self.daysGeneration:
-                return(self.getTPW_daysGeneration())        
-            elif self.teslaVarName == self.daysBattery:
-                return(self.getTPW_daysBattery())
-            elif self.teslaVarName == self.daysGridServices:
-                return(self.getTPW_daysGridServicesUse())      
-            elif self.teslaVarName == self.daysGenerator:
-                return(self.getTPW_daysGeneratorUse())      
-            elif self.teslaVarName == self.operationMode:
-                return(self.getTPW_operationMode())
-            elif self.teslaVarName == self.powerSupplyMode:
-                return(self.getTPW_powerSupplyMode())
-            elif self.teslaVarName == self.gridServiceActive:
-                return(self.getTPW_gridServiceActive())
-            elif self.teslaVarName == self.stormMode:
-                return(self.getTPW_stormMode())
-            elif self.teslaVarName == self.touMode:
-                return(self.getTPW_touMode())
-            elif self.teslaVarName == self.daysBattery:
-                return(self.getTPW_daysBattery())
-            elif self.teslaVarName == self.daysGridServices:
-                return(self.getTPW_daysGridServicesUse())
-            elif self.teslaVarName == self.ConnectedTesla:
-                return(self.getTPW_ConnectedTesla())               
-            elif self.teslaVarName == self.yesterdaySolar:
-                return(self.getTPW_yesterdaySolar())
-            elif self.teslaVarName == self.yesterdayConsumption:
-                return(self.getTPW_yesterdayConsumption())           
-            elif self.teslaVarName == self.yesterdayGeneration:
-                return(self.getTPW_yesterdayConsumption())
-            elif self.teslaVarName == self.yesterdayBattery:
-                return(self.getTPW_yesterdayBattery())                
-            elif self.teslaVarName == self.yesterdayGridServices:
-                return(self.getTPW_yesterdayGridServicesUse())
-            elif self.teslaVarName == self.yesterdayGenerator:
-                return(self.getTPW_yesterdayGeneratorUse())                                
-            elif self.teslaVarName == self.weekendOffPeakStartSec:
-                return(self.getTPW_getTouData('weekend', 'off_peak', 'start'))     
-            elif self.teslaVarName == self.weekendOffPeakEndSec:
-                return(self.getTPW_getTouData('weekend', 'off_peak', 'stop'))   
-            elif self.teslaVarName == self.weekendPeakStartSec:
-                return(self.getTPW_getTouData('weekend', 'peak', 'start'))   
-            elif self.teslaVarName == self.weekendPeakEndSec:
-                return(self.getTPW_getTouData('weekend', 'peak', 'stop'))   
-            elif self.teslaVarName == self.weekdayOffPeakStartSec:
-                return(self.getTPW_getTouData('weekday', 'off_peak', 'start'))   
-            elif self.teslaVarName == self.weekdayOffPeakEndSec:
-                return(self.getTPW_getTouData('weekday', 'off_peak', 'stop'))   
-            elif self.teslaVarName == self.weekdayPeakStartSec:
-                return(self.getTPW_getTouData('weekday', 'peak', 'start'))   
-            elif self.teslaVarName == self.weekdayPeakEndSec:
-                return(self.getTPW_getTouData('weekday', 'peak', 'stop'))   
-            elif (self.teslaVarName == self.nodeServerUp) or (self.teslaVarName ==  self.pollSkip) :
-                return(self.isNodeServerUp())
-            else:
-
-                LOGGER.debug('Error - unknown variable: ' + str(self.teslaVarName )) 
-           
-        else:    
-            LOGGER.debug('Error - unknown variable: ' + str(ISYvar)) 
-
     ''' *****************************************************************
 
     methods to retrieve data.  pollSystemData() is used to query the
@@ -774,9 +467,6 @@ class tesla_info:
 
         return( self.ISYoperationModeEnum [key])
     
-    def getOperatingModeISYVar(self, node):
-        return(self.isyINFO.varToISY(node, self.operationMode))
-
     def setTPW_operationMode(self, index):
         return(self.TPWcloud.teslaSetOperationMode(self.operationModeEnum[index]))
 
@@ -819,9 +509,6 @@ class tesla_info:
             else:
                 return(0)
 
-    def getStormModeISYVar(self, node):
-        return(self.isyINFO.varToISY(node, self.stormMode))
-
     def setTPW_stormMode(self, mode):
         return(self.TPWcloud.teslaSetStormMode(mode==1))
 
@@ -829,9 +516,6 @@ class tesla_info:
         if self.TPWcloudAccess:
             return(self.ISYtouEnum[self.TPWcloud.teslaExtractTouMode()])        
 
-
-    def getTOUmodeISYVar(self, node):
-        return(self.isyINFO.varToISY(node, self.touMode))            
 
     def getTPW_touSchedule(self):
         if self.TPWcloudAccess:        
@@ -854,39 +538,6 @@ class tesla_info:
     def getTPW_getTouData(self, days, peakMode, startEnd ):
         if self.TPWcloudAccess:        
             return(self.TPWcloud.teslaExtractTouTime(days, peakMode, startEnd ))
-
-    def getTouWeekendOffpeakStartISYVar(self, node):
-        if self.TPWcloudAccess:        
-            return(self.isyINFO.varToISY(node, self.weekendOffPeakStartSec))
-
-    def getTouWeekendOffpeakEndISYVar(self, node):
-        if self.TPWcloudAccess:        
-            return(self.isyINFO.varToISY(node, self.weekendOffPeakEndSec))    
-
-    def getTouWeekendPeakStartISYVar(self, node):
-        if self.TPWcloudAccess:        
-            return(self.isyINFO.varToISY(node, self.weekendPeakStartSec))
-
-    def getTouWeekendPeakEndISYVar(self, node):
-        if self.TPWcloudAccess:        
-            return(self.isyINFO.varToISY(node, self.weekendPeakEndSec))    
-
-    def getTouWeekOffpeakStartISYVar(self, node):
-        if self.TPWcloudAccess:        
-            return(self.isyINFO.varToISY(node, self.weekdayOffPeakStartSec))
-
-    def getTouWeekOffpeakEndISYVar(self, node):
-        if self.TPWcloudAccess:        
-            return(self.isyINFO.varToISY(node, self.weekdayOffPeakEndSec))    
-
-    def getTouWeekPeakStartISYVar(self, node):
-        if self.TPWcloudAccess:        
-            return(self.isyINFO.varToISY(node, self.weekdayPeakStartSec))
-
-    def getTouWeekPeakEndISYVar(self, node):
-        if self.TPWcloudAccess:        
-            return(self.isyINFO.varToISY(node, self.weekdayPeakEndSec))    
-
 
     def disconnectTPW(self):
         if self.TPWlocalAccess:
