@@ -48,14 +48,14 @@ ST-nlspwsolar-GV1-NAME = Current Solar Supply
 ST-nlspwsolar-GV2-NAME = Solar Power Today
 ST-nlspwsolar-GV3-NAME = Solar Power Yesterday
 
-ND-pwgen-NAME = Power Wall Generator Status
-ND-pwgen-ICON = Electricity
+ND-pwgenerator-NAME = Power Wall Generator Status
+ND-pwgenerator-ICON = Electricity
 CMD-nlspwgen-UPDATE-NAME = Update System Data
 ST-nlspwgen-GV1-NAME = Generator Power Today
 ST-nlspwgen-GV2-NAME = Generator Power Yesterday
 
-ND-pwsetup-NAME = Power Wall Generator Status
-ND-pwsetupgen-ICON = Electricity
+ND-pwsetup-NAME = Power Wall Control Parameters
+ND-pwsetup-ICON = Electricity
 CMD-nlspwsetup-BACKUP_PCT-NAME =  Backup Reserve (%)
 CMD-nlspwsetup-OP_MODE-NAME = Operating Mode
 CMD-nlspwsetup-STORM_MODE-NAME = Storm Mode
